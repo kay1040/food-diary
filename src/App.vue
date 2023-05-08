@@ -1,11 +1,7 @@
-<script setup>
-
-</script>
-
 <template>
-
+  <div id="app">
+    <header />
+    <router-view />
+    <footer />
+  </div>
 </template>
-
-<style scoped>
-
-</style>
