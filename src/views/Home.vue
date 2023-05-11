@@ -1,8 +1,28 @@
+<template>
+  <div class="home">
+    <div class="container">
+      <h1 class="title">
+        <span v-text="text"></span>
+        <span :style="{ visibility: cursorVisible }" class="blinking-cursor">|</span>
+      </h1>
+      <button :style="{ visibility: buttonVisible }" class="btn unselectable" @click="goToStart">
+        START
+      </button>
+    </div>
+  </div>
+</template>
+
 <script setup>
 import { onMounted, ref } from 'vue'
+import router from '../router';
 const title = "Healthy eating is a journey, not a destination.\nLet's enjoy the ride!"
 let text = ref('');
+let cursorVisible = ref('visible')
 let buttonVisible = ref('hidden')
+
+const goToStart = () => {
+  router.push({ name: 'auth-form' })
+}
 
 onMounted(() => {
   let i = 0;
@@ -10,6 +30,7 @@ onMounted(() => {
     text.value += title[i++];
     if (i === title.length) {
       clearInterval(timer);
+      cursorVisible.value = 'hidden'
       setTimeout(() => {
         buttonVisible.value = 'visible';
       }, 500);
@@ -18,57 +39,45 @@ onMounted(() => {
 })
 </script>
 
-<template>
-  <div class="home">
-    <div class="container">
-      <h1 class="title">
-        <span v-text="text"></span>
-        <span></span>
-      </h1>
-      <button :style="{ visibility: buttonVisible }" class="btn">START</button>
-    </div>
-  </div>
-</template>
 <style lang="scss" scoped>
-@mixin mobile {
-  @media(max-width:768px) {
-    @content;
+
+@keyframes cursor-blink {
+  from, to {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
   }
 }
 
 .home {
   width: 100%;
   height: 100%;
-  background-image: url('/images/background.jpg');
-  background-size: cover;
-
-  @include mobile {
-    background-position: center center;
-  }
 
   .container {
-    height: auto;
-    padding: 50px 20px;
-    max-width: 1000px;
-    width: 80%;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     text-align: center;
     line-height: 2;
     flex-flow: column;
-    border-radius: 10px;
     background-color: rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(3px);
 
     .title {
       font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
       white-space: pre-wrap;
       color: white;
+      
 
       @include mobile {
+        padding: 0 1.5rem;
         font-size: 1.5rem;
+      }
+
+      .blinking-cursor {
+        animation: cursor-blink .7s infinite;
       }
     }
 
@@ -85,9 +94,10 @@ onMounted(() => {
       background-color: #fff;
       box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
       cursor: pointer;
+      transition: all .3s;
 
       &:hover {
-        background-color: rgba(255, 255, 255, 0.8);
+        transform: scale(1.2);
       }
     }
   }
