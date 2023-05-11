@@ -1,20 +1,22 @@
 <template>
-  <div class="form-container">
-    <form class="auth-form" @submit.prevent="handleSubmit" v-if="isLoginForm">
-      <h2>LOG IN</h2>
-      <input type="text" placeholder="Email Address" v-model="email">
-      <input type="password" placeholder="Password" v-model="password">
-      <button class="login-btn">LOG IN</button>
-      <a class="toggle-from" @click="isLoginForm = !isLoginForm">Create Account</a>
-    </form>
-    <form class="auth-form" @submit.prevent="handleSubmit" v-if="!isLoginForm">
-      <h2>SIGN UP</h2>
-      <input type="text" placeholder="Email Address" v-model="email">
-      <input type="password" placeholder="Password" v-model="password">
-      <input type="password" placeholder="Repeat Password" v-model="passwordConfirmation">
-      <button class="login-btn">SIGN UP</button>
-      <a class="toggle-from" @click="isLoginForm = !isLoginForm">Already have an account?</a>
-    </form>
+  <div class="background">
+    <div class="form-container">
+      <form class="auth-form" @submit.prevent="handleSubmit" v-if="isLoginForm">
+        <h2>LOG IN</h2>
+        <input type="text" placeholder="Email Address" v-model="email">
+        <input type="password" placeholder="Password" v-model="password">
+        <button class="login-btn">LOG IN</button>
+        <a class="toggle-from" @click="isLoginForm = !isLoginForm">Create Account</a>
+      </form>
+      <form class="auth-form" @submit.prevent="handleSubmit" v-if="!isLoginForm">
+        <h2>SIGN UP</h2>
+        <input type="text" placeholder="Email Address" v-model="email">
+        <input type="password" placeholder="Password" v-model="password">
+        <input type="password" placeholder="Repeat Password" v-model="passwordConfirmation">
+        <button class="login-btn">SIGN UP</button>
+        <a class="toggle-from" @click="isLoginForm = !isLoginForm">Already have an account?</a>
+      </form>
+    </div>
   </div>
 </template>
 <script setup>
@@ -22,8 +24,8 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 const router = useRouter()
 const isLoginForm = ref(true)
-const handleSubmit = (e) => {
-  router.push({ name: 'user' })
+const handleSubmit = () => {
+  if (isLoginForm) router.push({ name: 'user' })
 }
 </script>
 <style lang="scss" scoped >
@@ -45,6 +47,7 @@ const handleSubmit = (e) => {
     width: 30%;
     height: 50%;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+
     @include mobile {
       width: 85%;
     }
@@ -75,7 +78,7 @@ const handleSubmit = (e) => {
 
     .login-btn {
       color: #fff;
-      background-color:#697785;
+      background-color: #697785;
       margin-bottom: 12px;
     }
 

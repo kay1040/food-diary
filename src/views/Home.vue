@@ -1,5 +1,5 @@
 <template>
-  <div class="home">
+  <div class="home background">
     <div class="container">
       <h1 class="title">
         <span v-text="text"></span>
@@ -53,7 +53,11 @@ onMounted(() => {
 .home {
   width: 100%;
   height: 100%;
+  height: 100vh;
 
+  @include mobile {
+    background-position: center center;
+  }
   .container {
     height: 100%;
     display: flex;
