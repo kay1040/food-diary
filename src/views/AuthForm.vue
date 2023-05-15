@@ -6,15 +6,15 @@
         <input type="text" placeholder="Email Address" v-model="email">
         <input type="password" placeholder="Password" v-model="password">
         <button class="login-btn">LOG IN</button>
-        <a class="toggle-from" @click="isLoginForm = !isLoginForm">Create Account</a>
+        <p class="toggle-from">Don't have an account yet? <span @click="isLoginForm = !isLoginForm">Create one.</span></p>
       </form>
       <form class="auth-form" @submit.prevent="handleSubmit" v-if="!isLoginForm">
         <h2>SIGN UP</h2>
         <input type="text" placeholder="Email Address" v-model="email">
         <input type="password" placeholder="Password" v-model="password">
-        <input type="password" placeholder="Repeat Password" v-model="passwordConfirmation">
+        <input type="password" placeholder="Confirm Password" v-model="passwordConfirmation">
         <button class="login-btn">SIGN UP</button>
-        <a class="toggle-from" @click="isLoginForm = !isLoginForm">Already have an account?</a>
+        <p class="toggle-from">Already have an account? <span @click="isLoginForm = !isLoginForm">Login in.</span></p>
       </form>
     </div>
   </div>
@@ -25,7 +25,11 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 const isLoginForm = ref(true)
 const handleSubmit = () => {
-  if (isLoginForm) router.push({ name: 'user' })
+  if (isLoginForm.value) {
+    router.push({ name: 'user' })
+  } else {
+    isLoginForm.value = true
+  }
 }
 </script>
 <style lang="scss" scoped >
@@ -44,8 +48,8 @@ const handleSubmit = () => {
     align-items: center;
     flex-direction: column;
     background-color: #fff;
-    width: 30%;
-    height: 50%;
+    max-width: 400px;
+    padding: 60px;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
 
     @include mobile {
@@ -71,7 +75,6 @@ const handleSubmit = () => {
       width: 280px;
       padding: 15px 0;
       border: none;
-      border-radius: 4px;
       font-weight: bold;
       cursor: pointer;
     }
@@ -83,8 +86,15 @@ const handleSubmit = () => {
     }
 
     .toggle-from {
+      width: 280px;
+      text-align: center;
       color: #697785;
-      cursor: pointer;
+      font-size: 12px;
+
+      span {
+        cursor: pointer;
+        color: #248cf3;
+      }
     }
   }
 }

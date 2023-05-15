@@ -20,7 +20,7 @@ watchEffect(() => {
     isShowHeaderColor.value = true
   }
 })
-console.log(uid);
+
 </script>
 <style lang="scss" scoped>
 header {

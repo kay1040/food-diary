@@ -10,7 +10,12 @@ const routes = [
     path: '/auth-form',
     name: 'auth-form',
     component: () => import('../views/AuthForm.vue'),
-  }
+  },
+  {
+    path: '/user',
+    name: 'user',
+    component: () => import('../views/User.vue'),
+  },
 ]
 
 const router = createRouter({
