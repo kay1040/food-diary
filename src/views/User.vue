@@ -1,26 +1,22 @@
 <template>
-  <DiaLog :dialogVisible="dialogVisible" @on-close="handleCloseDialog" title="Add Food" />
+  <DiaLog :dialogVisible="dialogVisible" title="Add Food" @on-close="handleCloseDialog" @on-add="handleAddFood" />
   <div class="user">
     <div class="calender">
       <Calendar @selected-day="getSelectedDay" :fake-data="fakeData" />
     </div>
-    <div class="details" v-if="selectedDay">
+    <div class="details" v-if="selectedDay" >
       <div class="seleted-day">
         {{ selectedDay }}
-        <el-icon class="add-btn" @click="handleAddFood">
+        <el-icon class="add-btn" @click="dialogVisible.value = true">
           <Plus />
         </el-icon>
       </div>
       <ul>
-        <li 
-          v-if="getFoodsDataBySelectedDay()" 
-          v-for="food in getFoodsDataBySelectedDay()" 
-          :key="food.name"
-        >
-        {{ food.name}} - {{ food.calories }} kcal
-      </li>
+        <li v-if="getFoodsDataBySelectedDay()" v-for="food in getFoodsDataBySelectedDay()" :key="food.name">
+          {{ food.name }} - {{ food.calories }} kcal
+        </li>
       </ul>
-      <div> Total Calories: {{ fakeData.find(item => item.date === selectedDay)?.totalCalories }} kcal</div>
+      <div v-if="getFoodsDataBySelectedDay()"> Total Calories: {{ fakeData.find(item => item.date === selectedDay)?.totalCalories }} kcal</div>
     </div>
   </div>
 </template>
@@ -78,7 +74,6 @@ const getSelectedDay = (day) => {
 
 const handleCloseDialog = () => {
   dialogVisible.value = false
-  console.log(dialogVisible.value);
 }
 
 const getFoodsDataBySelectedDay = () => {
@@ -86,9 +81,25 @@ const getFoodsDataBySelectedDay = () => {
 }
 
 
-const handleAddFood = () => {
-  dialogVisible.value = true
+const handleAddFood = (foodData) => {
+  const index = fakeData.findIndex(item => item.date === selectedDay.value);
+  const isExist = index !== -1;
+  console.log(isExist);
 
+  if (isExist) {
+    console.log(fakeData[index].foods);
+    fakeData[index].foods.push(foodData)
+    fakeData[index].totalCalories += foodData.calories
+  } else {
+    fakeData.push({
+      id: fakeData.at(-1) + 1,
+      date: selectedDay,
+      foods: [
+        { ...foodData },
+      ],
+      totalCalories: foodData.calories
+    },)
+  }
 }
 
 </script>
@@ -142,6 +153,7 @@ const handleAddFood = () => {
 
     ul {
       margin: 20px 0;
+
       li {
         padding: 6px 0;
       }

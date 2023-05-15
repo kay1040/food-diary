@@ -1,7 +1,7 @@
 <template>
   <el-calendar v-model="value">
     <template #date-cell="{ data }">
-      <div class="content" @click="emit('selected-day', data.day)">
+      <div class="content" @click="emits('selected-day', data.day)">
         <p>
           {{ data.day.split('-')[2] }}
         </p>
@@ -19,7 +19,7 @@ const value = ref(new Date())
 
 
 const props = defineProps(['fake-data'])
-const emit = defineEmits(['selected-day'])
+const emits = defineEmits(['selected-day'])
 
 
 
