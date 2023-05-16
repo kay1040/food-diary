@@ -10,7 +10,7 @@
 import { ref, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 const router = useRouter()
-const uid = router.currentRoute.value.name
+
 const isShowHeaderColor = ref(true)
 watchEffect(() => {
   const path = router.currentRoute.value.path
@@ -28,13 +28,14 @@ header {
   position: absolute;
   z-index: 999;
   height: 70px;
+  line-height: 70px;
+  font-size: 26px;
 }
 
 .logo {
   font-weight: bold;
-  font-size: 32px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  margin: 10px 25px;
+  margin-left: 20px;
   text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.2);
 
   a {
