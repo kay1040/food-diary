@@ -1,28 +1,39 @@
 <template>
-  <DiaLog :dialogVisible="dialogVisible" title="Add Food" @on-close="handleCloseDialog" @on-add="handleAddFood" />
+  <Dialog :dialog-visible="dialogVisible" :title="dialogTitle" :selected-food="selectedFood" @on-close="handleCloseDialog"
+    @on-add="handleAddFood" @on-edit="handleEditFood" />
   <div class="user">
     <div class="calender">
       <Calendar @selected-day="getSelectedDay" :fake-data="fakeData" />
     </div>
-    <div class="details" v-if="selectedDay" >
+    <div class="details" v-if="selectedDay">
       <div class="seleted-day">
         {{ selectedDay }}
-        <el-icon class="add-btn" @click="dialogVisible.value = true">
+        <el-icon class="add-btn" @click="handleShowAddDialog">
           <Plus />
         </el-icon>
       </div>
-      <ul>
-        <li v-if="getFoodsDataBySelectedDay()" v-for="food in getFoodsDataBySelectedDay()" :key="food.name">
-          {{ food.name }} - {{ food.calories }} kcal
+      <ul class="list">
+        <li v-if="getFoodsDataBySelectedDay()" v-for="food in getFoodsDataBySelectedDay()" :key="food.id">
+          <span>{{ food.name }} - {{ food.calories }} kcal</span>
+          <span class="icon">
+            <el-icon class="edit" @click="handleShowEditDialog(food.id)">
+              <Edit />
+            </el-icon>
+            <el-icon class="delete" @click="handleDeleteFood(food.id)">
+              <Delete />
+            </el-icon>
+          </span>
         </li>
       </ul>
-      <div v-if="getFoodsDataBySelectedDay()"> Total Calories: {{ fakeData.find(item => item.date === selectedDay)?.totalCalories }} kcal</div>
+      <div v-if="getFoodsDataBySelectedDay()"> Total Calories: {{ fakeData.find(item => item.date ===
+        selectedDay)?.totalCalories }} kcal</div>
     </div>
   </div>
 </template>
 <script setup>
 import { ref, reactive } from 'vue'
-import DiaLog from '../components/Dialog.vue'
+import { nanoid } from 'nanoid'
+import Dialog from '../components/Dialog.vue'
 import Calendar from '../components/Calendar.vue';
 
 const fakeData = reactive([
@@ -30,9 +41,9 @@ const fakeData = reactive([
     id: '001',
     date: '2023-05-06',
     foods: [
-      { name: 'prok', calories: 280 },
-      { name: 'milk', calories: 320 },
-      { name: 'ice cream', calories: 240 },
+      { id: '001', name: 'prok', calories: 280 },
+      { id: '002', name: 'milk', calories: 320 },
+      { id: '003', name: 'ice cream', calories: 240 },
     ],
     totalCalories: 840
   },
@@ -40,9 +51,9 @@ const fakeData = reactive([
     id: '002',
     date: '2023-05-07',
     foods: [
-      { name: 'steak', calories: 420 },
-      { name: 'soup', calories: 280 },
-      { name: 'cake', calories: 360 },
+      { id: '004', name: 'steak', calories: 420 },
+      { id: '005', name: 'soup', calories: 280 },
+      { id: '006', name: 'cake', calories: 360 },
     ],
     totalCalories: 1060
   },
@@ -50,7 +61,7 @@ const fakeData = reactive([
     id: '003',
     date: '2023-05-08',
     foods: [
-      { name: 'potato', calories: 280 },
+      { id: '007', name: 'potato', calories: 280 },
     ],
     totalCalories: 280
   },
@@ -58,16 +69,27 @@ const fakeData = reactive([
     id: '004',
     date: '2023-05-09',
     foods: [
-      { name: 'tomato', calories: 160 },
-      { name: 'egg', calories: 180 },
+      { id: '008', name: 'tomato', calories: 160 },
+      { id: '009', name: 'egg', calories: 180 },
     ],
     totalCalories: 340
   },
 ])
 
+
 const dialogVisible = reactive({ value: false })
 
-const selectedDay = ref('')
+let dialogTitle = ref('')
+
+const currentDate = new Date();
+const year = currentDate.getFullYear();
+const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+const day = String(currentDate.getDate()).padStart(2, '0');
+
+const selectedDay = ref(`${year}-${month}-${day}`)
+
+let selectedFood = reactive({});
+
 const getSelectedDay = (day) => {
   selectedDay.value = day
 }
@@ -80,26 +102,65 @@ const getFoodsDataBySelectedDay = () => {
   return fakeData.filter(item => item.date === selectedDay.value)[0]?.foods || null
 }
 
+const handleShowAddDialog = () => {
+  dialogVisible.value = true
+  dialogTitle.value = 'ADD FOOD'
+}
 
 const handleAddFood = (foodData) => {
-  const index = fakeData.findIndex(item => item.date === selectedDay.value);
+  const date = selectedDay.value
+  const index = fakeData.findIndex(item => item.date === date);
   const isExist = index !== -1;
-  console.log(isExist);
 
   if (isExist) {
-    console.log(fakeData[index].foods);
-    fakeData[index].foods.push(foodData)
+    fakeData[index].foods.push({ id: nanoid(), ...foodData })
     fakeData[index].totalCalories += foodData.calories
   } else {
     fakeData.push({
-      id: fakeData.at(-1) + 1,
-      date: selectedDay,
+      id: nanoid(),
+      date,
       foods: [
         { ...foodData },
       ],
       totalCalories: foodData.calories
     },)
   }
+}
+
+const handleShowEditDialog = (id) => {
+  dialogVisible.value = true
+  dialogTitle.value = 'EDIT FOOD'
+  const date = selectedDay.value
+  const index = fakeData.findIndex(item => item.date === date);
+  selectedFood.id = fakeData[index].foods.find(item => item.id === id).id
+  selectedFood.name = fakeData[index].foods.find(item => item.id === id).name
+  selectedFood.calories = fakeData[index].foods.find(item => item.id === id).calories
+}
+
+const handleEditFood = (foodData) => {
+  const date = selectedDay.value
+  const index = fakeData.findIndex(item => item.date === date);
+  const foodIndex = fakeData[index].foods.findIndex(item => item.id === foodData.id)
+  fakeData[index].foods[foodIndex] = { ...foodData }
+  fakeData[index].totalCalories = fakeData[index].totalCalories - selectedFood.calories + foodData.calories
+}
+
+const handleDeleteFood = (id) => {
+  ElMessageBox({
+    message: 'Are you sure to delete this food data?',
+    type: 'warning',
+    confirmButtonText: 'Delete',
+    cancelButtonText: 'Cancel',
+    showCancelButton: true,
+    closeOnClickModal: false,
+  }).then(() => {
+    const date = selectedDay.value
+    const index = fakeData.findIndex(item => item.date === date);
+    fakeData[index].foods = fakeData[index].foods.filter(item => item.id !== id)
+    ElMessage.success('Successfully deleted!');
+  }).catch(() => {
+    ElMessage.info('Deletion canceled!');
+  });
 }
 
 </script>
@@ -130,6 +191,7 @@ const handleAddFood = (foodData) => {
     padding: 30px;
     background: #e3e8eb;
     width: 20%;
+    min-height: 300px;
 
     @include mobile {
       width: 100%;
@@ -151,11 +213,23 @@ const handleAddFood = (foodData) => {
       }
     }
 
-    ul {
+    .list {
       margin: 20px 0;
+
 
       li {
         padding: 6px 0;
+        display: flex;
+        justify-content: space-between;
+        border-bottom: #555 1px solid;
+        height: 40px;
+        padding-top: 14px;
+        
+        .edit, .delete {
+          margin-left: 10px;
+          margin-top: 4px;
+        }
+
       }
     }
   }
