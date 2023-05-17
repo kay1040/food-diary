@@ -6,23 +6,20 @@
       <el-icon>
         <Search />
       </el-icon>
-      to look up the calorie content of a food (per 100g / kcal), or enter it manually.
+      button to look up the calorie content of a food (per 100g / kcal), or enter it manually.
     </span>
-    <el-form :inline="true" :model="foodData" class="form" ref="formRef">
+    <el-form :model="foodData" class="form" ref="formRef">
       <el-form-item label="Food:" prop="name" :rules="[{ required: true, message: 'Name is required.' }]">
-        <el-input v-model="foodData.name" @change="handleSearch(foodData.name)" />
-        <el-icon>
-          <Search />
-        </el-icon>
+        <el-input v-model="foodData.name">
+          <template #append>
+            <el-button :icon="Search" @click="handleSearch(foodData.name)" />
+          </template>
+        </el-input>
       </el-form-item>
-      <el-form-item 
-        label="Calories:" 
-        prop="calories" 
-        :rules="[
-          { required: true, message: 'Calories is required.' }, 
-          { type: 'number', message: 'Calories must be a number.'}
-          ]"
-      >
+      <el-form-item label="Calories:" prop="calories" :rules="[
+        { required: true, message: 'Calories is required.' },
+        { type: 'number', message: 'Calories must be a number.' }
+      ]">
         <el-input v-model.number="foodData.calories" />
       </el-form-item>
     </el-form>
@@ -40,11 +37,10 @@
 <script setup>
 import axios from 'axios'
 import { nanoid } from 'nanoid'
-import { reactive, ref, watchEffect } from 'vue';
-
+import { reactive, ref, watchEffect } from 'vue'
+import { Search } from '@element-plus/icons-vue'
 const props = defineProps(['dialog-visible', 'title', 'selected-food'])
 const emits = defineEmits(['on-close', 'on-add', 'on-edit'])
-
 
 const formRef = ref(null)
 
@@ -72,14 +68,16 @@ const handleSearch = async (food) => {
       throw Error(response.status)
     }
   } catch (error) {
-    console.log(error);
+    ElMessage({
+      showClose: true,
+      message: error.message,
+      type: 'error'
+    })
   }
 }
 
 watchEffect(() => {
-  if (props.selectedFood?.name) {
-    Object.assign(foodData, props.selectedFood)
-  }
+  Object.assign(foodData, props.selectedFood)
 })
 
 const handleSubmit = (formRef, foodData) => {
@@ -100,7 +98,6 @@ const handleSubmit = (formRef, foodData) => {
       })
     }
   })
-
 }
 
 const handleCancel = (formRef) => {
@@ -116,19 +113,18 @@ const handleClose = (formRef) => {
       emits('on-close')
     })
     .catch((error) => {
-      console.log(error);
+      ElMessage({
+        showClose: true,
+        message: error.message,
+        type: 'error'
+      })
     })
 }
 
 </script>
 <style lang="scss" scoped>
 .form {
-  display: flex;
-  flex-direction: column;
-
-  .desc {
-    margin-bottom: 20px;
-  }
+  margin-top: 40px;
 }
 
 .dialog-footer button:first-child {
