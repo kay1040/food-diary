@@ -226,7 +226,7 @@ const handleDeleteFood = (id) => {
 
 
       li {
-        padding: 6px 0;
+        padding: 6px;
         display: flex;
         justify-content: space-between;
         border-bottom: #555 1px solid;
