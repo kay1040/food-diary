@@ -1,10 +1,7 @@
 <template>
   <div class="home background">
     <div class="container">
-      <h1 class="title">
-        <span v-text="text"></span>
-        <span :style="{ visibility: cursorVisible }" class="blinking-cursor">|</span>
-      </h1>
+      <TypingEffect :text="title" delay="50" class="title" />
       <button :style="{ visibility: buttonVisible }" class="btn unselectable" @click="goToStart">
         START
       </button>
@@ -16,8 +13,6 @@
 import { onMounted, ref } from 'vue'
 import router from '../router';
 const title = "Healthy eating is a journey, not a destination.\nLet's enjoy the ride!"
-let text = ref('');
-let cursorVisible = ref('visible')
 let buttonVisible = ref('hidden')
 
 const goToStart = () => {
@@ -25,31 +20,14 @@ const goToStart = () => {
 }
 
 onMounted(() => {
-  let i = 0;
-  const timer = setInterval(() => {
-    text.value += title[i++];
-    if (i === title.length) {
-      clearInterval(timer);
-      cursorVisible.value = 'hidden'
-      setTimeout(() => {
-        buttonVisible.value = 'visible';
-      }, 500);
-    }
-  }, 50);
+  setTimeout(() => {
+    buttonVisible.value = 'visible';
+  }, title.length * 50 + 1100);
+
 })
 </script>
 
 <style lang="scss" scoped>
-
-@keyframes cursor-blink {
-  from, to {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0;
-  }
-}
-
 .home {
   width: 100%;
   height: 100%;
@@ -58,6 +36,7 @@ onMounted(() => {
   @include mobile {
     background-position: center center;
   }
+
   .container {
     height: 100%;
     display: flex;
@@ -73,15 +52,11 @@ onMounted(() => {
       font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
       white-space: pre-wrap;
       color: white;
-      
+      font-size: 36px;
 
       @include mobile {
         padding: 0 1.5rem;
         font-size: 1.5rem;
-      }
-
-      .blinking-cursor {
-        animation: cursor-blink .7s infinite;
       }
     }
 

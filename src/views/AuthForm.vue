@@ -28,7 +28,7 @@ const handleSubmit = () => {
   if (isLoginForm.value) {
     router.push({ name: 'user' })
   } else {
-    isLoginForm.value = true
+    router.push({ name: 'start' })
   }
 }
 </script>
