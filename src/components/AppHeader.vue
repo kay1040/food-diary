@@ -1,12 +1,17 @@
 <template>
   <header :style="{ backgroundColor: isShowHeaderColor ? '#697785' : '' }">
     <div class="logo">
-      <a class="unselectable" href="/">Food Diary</a>
+      <a href="/">Food Diary</a>
     </div>
     <div class="user" v-if="isShowUserIcon">
-      <el-icon>
+      <el-icon @click.stop="isShowUserMenu = !isShowUserMenu">
         <UserFilled />
       </el-icon>
+      <ul class="user-menu" v-if="isShowUserMenu" @click.stop>
+        <li><a href="/user">My body data</a></li>
+        <li><a href="/user/food-diary">Food diary</a></li>
+        <li><a href="/">Log out</a></li>
+      </ul>
     </div>
   </header>
 </template>
@@ -18,10 +23,11 @@ const router = useRouter()
 
 const isShowHeaderColor = ref(true)
 const isShowUserIcon = ref(true)
+const isShowUserMenu = ref(false)
 
 watchEffect(() => {
   const path = router.currentRoute.value.path
-  if (path === '/' || path === '/auth-form') {
+  if (path === '/' || path === '/auth-form' || path === '/start') {
     isShowHeaderColor.value = false
     isShowUserIcon.value = false
   } else {
@@ -29,6 +35,15 @@ watchEffect(() => {
     isShowUserIcon.value = true
   }
 })
+
+watchEffect(() => {
+  if (isShowUserMenu.value) {
+    document.body.addEventListener('click', () => {
+      isShowUserMenu.value = false
+    })
+  }
+})
+
 
 </script>
 <style lang="scss" scoped>
@@ -54,10 +69,42 @@ header {
       font-size: 26px;
     }
   }
+
   .user {
     color: #fff;
-    cursor: pointer;
+    position: relative;
+
+    i {
+      cursor: pointer;
+    }
+
+    .user-menu {
+      color: #555;
+      font-size: 14px;
+      position: absolute;
+      top: 50px;
+      right: 0;
+      width: 150px;
+      padding: 12px 0;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.2);
+
+      li {
+        height: 30px;
+        line-height: 30px;
+        padding: 0 20px;
+
+        &:hover {
+          background-color: #eee;
+
+          a {
+            display: inline-block;
+            width: 100%;
+          }
+        }
+      }
+    }
   }
 }
-
 </style>
