@@ -93,15 +93,17 @@ header {
       li {
         height: 30px;
         line-height: 30px;
-        padding: 0 20px;
+        padding: 0 20px;     
+
+        a {
+          display: inline-block;
+          width: 100%;
+          font-weight: bold;
+        }
 
         &:hover {
           background-color: #eee;
 
-          a {
-            display: inline-block;
-            width: 100%;
-          }
         }
       }
     }

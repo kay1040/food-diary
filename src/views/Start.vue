@@ -2,8 +2,8 @@
   <div class="start">
     <div class="img"></div>
     <form class="form">
-      <TypingEffect :text="steps[current].question" delay="100" :key="steps[current].question" class="question" />
-      <div class="answer">
+      <TypingEffect :text="steps[current].question" delay="80" :key="steps[current].question" class="question" />
+      <div class="answer" :style="{ display: isShowAnswer }">
         <select v-model="steps[current].answer" v-if="current === 0">
           <option disabled value="">Select</option>
           <option value="male">Male</option>
@@ -17,12 +17,14 @@
     </form>
   </div>
 </template>
+
 <script setup>
-import { reactive, ref } from 'vue'
+import { reactive, ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import TypingEffect from '../components/TypingEffect.vue';
 
 const router = useRouter()
+const isShowAnswer = ref('none')
 
 let current = ref(0)
 const steps = reactive([
@@ -47,10 +49,25 @@ const steps = reactive([
 const handleNextStep = () => {
   if (current.value < steps.length - 1) {
     current.value = current.value + 1
+    isShowAnswer.value = 'none'
   } else {
     router.push({ name: 'user' })
   }
 }
+
+onMounted(() => {
+  setTimeout(() => {
+    isShowAnswer.value = 'block'
+  }, steps[current.value].question.length * 80 + 1100);
+
+})
+
+watch(current, () => {
+
+  setTimeout(() => {
+    isShowAnswer.value = 'block'
+  }, steps[current.value].question.length * 80 + 1100);
+})
 
 </script>
 
