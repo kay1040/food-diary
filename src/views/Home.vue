@@ -22,7 +22,7 @@ const goToStart = () => {
 onMounted(() => {
   setTimeout(() => {
     buttonVisible.value = 'visible';
-  }, title.length * 50 + 1100);
+  }, title.length * 50 + 1200);
 
 })
 </script>

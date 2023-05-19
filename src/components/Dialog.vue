@@ -12,7 +12,7 @@
       <el-form-item label="Food:" prop="name" :rules="[{ required: true, message: 'Name is required.' }]">
         <el-input v-model="foodData.name">
           <template #append>
-            <el-button :icon="Search" @click="handleSearch(foodData.name)" />
+            <el-button icon="Search" @click="handleSearch(foodData.name)" />
           </template>
         </el-input>
       </el-form-item>
@@ -38,7 +38,7 @@
 import axios from 'axios'
 import { nanoid } from 'nanoid'
 import { reactive, ref, watchEffect } from 'vue'
-import { Search } from '@element-plus/icons-vue'
+
 const props = defineProps(['dialog-visible', 'title', 'selected-food'])
 const emits = defineEmits(['on-close', 'on-add', 'on-edit'])
 

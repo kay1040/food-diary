@@ -1,36 +1,33 @@
 <template>
-  <div :style="{ backgroundColor: steps[current].backgroundColor }">
-    <Transition name="fade">
+  <div :style="{ backgroundColor: steps[current].backgroundColor, overflow: 'hidden' }">
+    <Transition name="fade-slide-down-up" appear>
       <div v-show="isShowNextStep" class="start">
         <div class="img" :style="{ backgroundImage: steps[current].backgroundImage }"></div>
         <form class="form" :style="{ backgroundColor: steps[current].backgroundColor }">
-          <TypingEffect :text="steps[current].question" delay="50" :key="steps[current].question" class="question" />
-          <Transition name="fade">
-            <div class="answer" v-show="isShowAnswer">
+          <div>
+            <div class="question">{{ steps[current].question }}</div>
+            <div class="answer">
               <el-select v-model="steps[current].answer" v-if="current === 0" placeholder="Select" size="large">
                 <el-option label="Male" value="male" />
                 <el-option label="Female" value="female" />
               </el-select>
-              <el-input v-model.number="steps[current].answer" v-if="current === 1" size="large"
+              <el-input v-model.number="steps[current].answer" v-else-if="current === 1" size="large"
                 placeholder="Please Input" />
-              <el-input v-model.number="steps[current].answer" v-if="current === 2" size="large"
-                placeholder="Please Input" />
-              <el-input v-model.number="steps[current].answer" v-if="current === 3" size="large"
-                placeholder="Please Input" />
-              <el-select v-model="steps[current].answer" v-if="current === 4" placeholder="Select" size="large">
-                <el-option label="Extremely inactive" value="extremely-inactive" />
-                <el-option label="Sedentary" value="sedentary" />
-                <el-option label="Moderately active" value="moderately-active" />
-                <el-option label="Vigorously active" value="vigorously-active" />
-                <el-option label="Extremely active" value="extremely-active" />
+              <el-input v-model.number="steps[current].answer" v-else-if="current === 2" size="large"
+                placeholder="Please Input">
+                <template #append>cm</template>
+              </el-input>
+              <el-input v-model.number="steps[current].answer" v-else-if="current === 3" size="large"
+                placeholder="Please Input">
+                <template #append>kg</template>
+              </el-input>
+              <el-select v-model="steps[current].answer" v-else-if="current === 4" placeholder="Select" size="large">
+                <el-option label="Sedentary: office work, no exercise habits" value="sedentary" />
+                <el-option label="Lightly: exercise 1-2 days/week" value="lightly" />
+                <el-option label="Moderately: exercise 3-5 days/week" value="moderately" />
+                <el-option label="Heavy: exercise 6-7 days/week" value="heavy" />
+                <el-option label="Extremely: athlete level, exercise 2 times a day" value="extremely" />
               </el-select>
-              <ul v-if="current === 4" class="desc">
-                <li>Extremely inactive: Cerebral palsy patient.</li>
-                <li>Sedentary: Office worker getting little or no exercise.</li>
-                <li>Moderately active: Construction worker or person running one hour daily.</li>
-                <li>Vigorously active: Agricultural worker (non mechanized) or person swimming two hours daily.</li>
-                <li>Extremely active: Competitive cyclist.</li>
-              </ul>
               <button v-show="isShowPrevBtn" class="prev btn" @click.prevent="handlePrevStep">
                 <el-icon>
                   <Back />
@@ -42,7 +39,7 @@
                 </el-icon>
               </button>
             </div>
-          </Transition>
+          </div>
         </form>
       </div>
     </Transition>
@@ -50,16 +47,14 @@
 </template>
 
 <script setup>
-import { reactive, ref, onMounted, watch } from 'vue'
+import { reactive, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import TypingEffect from '../components/TypingEffect.vue';
 import { useUserStore } from '../stores/user'
 
 const router = useRouter()
 const user = useUserStore()
 
 const isShowNextStep = ref(true);
-const isShowAnswer = ref(false)
 const isShowPrevBtn = ref(false)
 
 let current = ref(0)
@@ -77,13 +72,13 @@ const steps = reactive([
     backgroundColor: '#281b08',
   },
   {
-    question: 'What is your height (unit: cm)?',
+    question: 'What is your height?',
     answer: '',
     backgroundImage: 'url("/images/start-bg3.jpg")',
     backgroundColor: '#444c41'
   },
   {
-    question: 'What is your weight (unit: kg)?',
+    question: 'What is your weight?',
     answer: '',
     backgroundImage: 'url("/images/start-bg4.jpg")',
     backgroundColor: '#12161a'
@@ -98,43 +93,32 @@ const steps = reactive([
 
 const handlePrevStep = () => {
   if (current.value > 0) {
-    isShowAnswer.value = false
     isShowNextStep.value = false;
     setTimeout(() => {
       current.value = current.value - 1
       isShowNextStep.value = true;
-    }, 300)
+    }, 200)
   }
 }
 
 const handleNextStep = async () => {
   if (current.value < steps.length - 1) {
-    isShowAnswer.value = false
     isShowNextStep.value = false;
     setTimeout(() => {
       current.value = current.value + 1
       isShowNextStep.value = true;
-    }, 300)
+    }, 200)
   } else {
-    user.gender = steps[0].answer
-    user.age = steps[1].answer
-    user.height = steps[2].answer
-    user.weight = steps[3].answer
-    user.activityLevel = steps[4].answer
+    user.userData.gender = steps[0].answer
+    user.userData.age = steps[1].answer
+    user.userData.height = steps[2].answer
+    user.userData.weight = steps[3].answer
+    user.userData.activityLevel = steps[4].answer
     router.push({ name: 'user' })
   }
 }
 
-onMounted(() => {
-  setTimeout(() => {
-    isShowAnswer.value = true
-  }, steps[current.value].question.length * 60 + 500)
-})
-
 watch(current, (newVal) => {
-  setTimeout(() => {
-    isShowAnswer.value = true
-  }, steps[newVal].question.length * 60 + 500)
   if (newVal > 0) {
     isShowPrevBtn.value = true
   } else {
@@ -145,14 +129,36 @@ watch(current, (newVal) => {
 </script>
 
 <style scoped lang="scss">
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s ease-in-out;
+.fade-slide-down-up-enter-active {
+  animation: fade-slide-down-up-enter 0.5s;
 }
 
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
+.fade-slide-down-up-leave-active {
+  animation: fade-slide-down-up-leave 0.5s;
+}
+
+@keyframes fade-slide-down-up-enter {
+  0% {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-slide-down-up-leave {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
 }
 
 :deep(*) {
@@ -188,49 +194,31 @@ watch(current, (newVal) => {
     color: #fff;
     height: 100%;
     width: 50%;
-    padding: 0 10%;
     position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
     @include mobile {
       width: 100%;
-      padding: 0 15%;
+      padding: 0 3rem;
     }
 
     .question {
       font-size: 24px;
-      margin-top: 45%;
-
-      @include mobile {
-        margin-top: 4rem;
-      }
     }
 
     .answer {
       margin-top: 30px;
-      padding-bottom: 150px;
+      padding-bottom: 100px;
 
       :deep(.el-select) {
-        width: 240px;
-
-        @include mobile {
-          width: 100%;
-        }
+        width: 100%;
       }
 
       :deep(.el-input) {
-        @include mobile {
           width: 100%;
-        }
       }
-
-      .desc {
-        margin-top: 20px;
-
-        li {
-          margin-top: 8px;
-        }
-      }
-
     }
 
     .prev {
@@ -260,6 +248,9 @@ watch(current, (newVal) => {
       background-color: #fff;
       font-size: 20px;
       cursor: pointer;
+      @include mobile {
+        bottom: 1.6rem;
+      }
     }
   }
 }

@@ -8,7 +8,7 @@
         <UserFilled />
       </el-icon>
       <ul class="user-menu" v-if="isShowUserMenu" @click.stop>
-        <li><a href="/user">My body data</a></li>
+        <li><a href="/user">User data</a></li>
         <li><a href="/user/food-diary">Food diary</a></li>
         <li><a href="/">Log out</a></li>
       </ul>
@@ -43,7 +43,6 @@ watchEffect(() => {
     })
   }
 })
-
 
 </script>
 <style lang="scss" scoped>
@@ -91,14 +90,14 @@ header {
       box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.2);
 
       li {
-        height: 30px;
-        line-height: 30px;
-        padding: 0 20px;     
+        height: 40px;
+        line-height: 40px;
+        padding: 0 30px;     
 
         a {
           display: inline-block;
           width: 100%;
-          font-weight: bold;
+          font-size: 16px;
         }
 
         &:hover {

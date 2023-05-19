@@ -3,14 +3,14 @@
     <div class="form-container">
       <form class="auth-form" @submit.prevent="handleSubmit" v-if="isLoginForm">
         <h2>LOG IN</h2>
-        <input type="text" placeholder="Email Address" v-model="email">
+        <input type="email" placeholder="Email Address" v-model="email">
         <input type="password" placeholder="Password" v-model="password">
         <button class="login-btn">LOG IN</button>
         <p class="toggle-from">Don't have an account yet? <span @click="isLoginForm = !isLoginForm">Create one.</span></p>
       </form>
       <form class="auth-form" @submit.prevent="handleSubmit" v-if="!isLoginForm">
         <h2>SIGN UP</h2>
-        <input type="text" placeholder="Email Address" v-model="email">
+        <input type="email" placeholder="Email Address" v-model="email">
         <input type="password" placeholder="Password" v-model="password">
         <input type="password" placeholder="Confirm Password" v-model="passwordConfirmation">
         <button class="login-btn">SIGN UP</button>
