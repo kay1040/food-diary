@@ -17,6 +17,11 @@ const routes = [
     component: () => import('../views/Profile.vue'),
   },
   {
+    path: '/user/password',
+    name: 'password',
+    component: () => import('../views/Password.vue'),
+  },
+  {
     path: '/start',
     name: 'start',
     component: () => import('../views/Start.vue'),

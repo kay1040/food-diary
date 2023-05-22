@@ -9,8 +9,8 @@
       </el-icon>
       <ul class="user-menu" v-if="isShowUserMenu" @click.stop>
         <li><a href="/user/food-diary">Food diary</a></li>
-        <li><a href="/user">Profile</a></li>
-        <li><a href="/user">Change Password</a></li>
+        <li><a href="/user/profile">Profile</a></li>
+        <li><a href="/user/password">Change Password</a></li>
         <li><a href="/">Log out</a></li>
       </ul>
     </div>
