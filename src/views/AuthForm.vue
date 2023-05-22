@@ -26,7 +26,7 @@ const router = useRouter()
 const isLoginForm = ref(true)
 const handleSubmit = () => {
   if (isLoginForm.value) {
-    router.push({ name: 'user' })
+    router.push({ name: 'profile' })
   } else {
     router.push({ name: 'start' })
   }

@@ -8,8 +8,9 @@
         <UserFilled />
       </el-icon>
       <ul class="user-menu" v-if="isShowUserMenu" @click.stop>
-        <li><a href="/user">User data</a></li>
         <li><a href="/user/food-diary">Food diary</a></li>
+        <li><a href="/user">Profile</a></li>
+        <li><a href="/user">Change Password</a></li>
         <li><a href="/">Log out</a></li>
       </ul>
     </div>
@@ -48,14 +49,14 @@ watchEffect(() => {
 <style lang="scss" scoped>
 header {
   width: 100%;
-  position: absolute;
   z-index: 999;
-  height: 70px;
-  line-height: 70px;
-  font-size: 24px;
+  height: 50px;
+  line-height: 50px;
+  font-size: 20px;
   display: flex;
   justify-content: space-between;
   padding: 0 20px;
+  position: absolute;
 
   .logo {
     font-weight: bold;
@@ -65,13 +66,14 @@ header {
     a {
       z-index: 9999;
       color: #fff;
-      font-size: 26px;
+      font-size: 24px;
     }
   }
 
   .user {
     color: #fff;
     position: relative;
+    margin-top: 4px;
 
     i {
       cursor: pointer;
@@ -79,15 +81,16 @@ header {
 
     .user-menu {
       color: #555;
-      font-size: 14px;
+      font-size: 12px;
       position: absolute;
-      top: 50px;
+      top: 40px;
       right: 0;
-      width: 150px;
+      width: 220px;
       padding: 12px 0;
       background-color: #fff;
       border-radius: 8px;
       box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.2);
+      z-index: 999;
 
       li {
         height: 40px;

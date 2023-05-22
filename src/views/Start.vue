@@ -114,7 +114,7 @@ const handleNextStep = async () => {
     user.userData.height = steps[2].answer
     user.userData.weight = steps[3].answer
     user.userData.activityLevel = steps[4].answer
-    router.push({ name: 'user' })
+    router.push({ name: 'profile' })
   }
 }
 

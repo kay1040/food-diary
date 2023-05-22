@@ -12,9 +12,9 @@ const routes = [
     component: () => import('../views/AuthForm.vue'),
   },
   {
-    path: '/user',
-    name: 'user',
-    component: () => import('../views/User.vue'),
+    path: '/user/profile',
+    name: 'profile',
+    component: () => import('../views/Profile.vue'),
   },
   {
     path: '/start',
