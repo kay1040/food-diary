@@ -39,5 +39,6 @@ export const useUserStore = defineStore('user', {
     updateUserData(newData) {
       this.userData = newData
     },
-  }
+  },
+  persist: true
 })
