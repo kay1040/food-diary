@@ -1,7 +1,7 @@
 <template>
   <Dialog :dialog-visible="dialogVisible" :title="dialogTitle" :selected-food="selectedFood" @on-close="handleCloseDialog"
     @on-add="handleAddFood" @on-edit="handleEditFood" />
-  <div class="user">
+  <div class="food-diary">
     <div class="calender">
       <Calendar @selected-day="getSelectedDay" :fake-data="fakeData" />
     </div>
@@ -27,8 +27,15 @@
           </li>
         </ul>
       </div>
-      <div v-if="getFoodsDataBySelectedDay()" class="total">
-        Total calories: {{ fakeData.find(item => item.date === selectedDay)?.totalCalories }} kcal
+      <div v-if="getFoodsDataBySelectedDay()">
+        <div class="calories">
+          <span>Total calories</span>
+          <span>{{ fakeData.find(item => item.date === selectedDay)?.totalCalories }} kcal</span>
+        </div>
+        <div class="calories">
+          <span>Remaining calories</span>
+          <span>{{ user.TDEE - fakeData.find(item => item.date === selectedDay)?.totalCalories }} kcal</span>
+        </div>
       </div>
     </div>
   </div>
@@ -38,6 +45,9 @@ import { ref, reactive } from 'vue'
 import { nanoid } from 'nanoid'
 import Dialog from '../components/Dialog.vue'
 import Calendar from '../components/Calendar.vue';
+import { useUserStore } from '../stores/user'
+
+const user = useUserStore()
 
 const fakeData = reactive([
   {
@@ -170,11 +180,11 @@ const handleDeleteFood = (id) => {
 </script>
 
 <style lang="scss" scoped>
-.user {
+.food-diary {
   background-color: #fff;
   background-image: none;
   display: flex;
-  padding-top: 70px;
+  padding-top: 50px;
 
   @include mobile {
     flex-direction: column;
@@ -193,10 +203,10 @@ const handleDeleteFood = (id) => {
 
   .details {
     padding: 30px;
-    background: #e3e8eb;
+    background: #ddd;
     width: 20%;
     min-height: 300px;
-    min-width: 300px;
+    min-width: 360px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -245,6 +255,11 @@ const handleDeleteFood = (id) => {
 
 
       }
+    }
+
+    .calories {
+      display: flex;
+      justify-content: space-between;
     }
   }
 }

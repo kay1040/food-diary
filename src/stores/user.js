@@ -22,15 +22,15 @@ export const useUserStore = defineStore('user', {
     TDEE: state => {
       switch (state.userData.activityLevel) {
         case 'sedentary':
-          return Math.round(state.BMR * 1.2 * 100) / 100
+          return Math.round(state.BMR * 1.2)
         case 'lightly':
-          return Math.round(state.BMR * 1.375 * 100) / 100
+          return Math.round(state.BMR * 1.375)
         case 'moderately':
-          return Math.round(state.BMR * 1.55 * 100) / 100
+          return Math.round(state.BMR * 1.55)
         case 'heavy':
-          return Math.round(state.BMR * 1.725 * 100) / 100
+          return Math.round(state.BMR * 1.725)
         case 'extremely':
-          return Math.round(state.BMR * 1.9 * 100) / 100
+          return Math.round(state.BMR * 1.9)
       }
     },
 
