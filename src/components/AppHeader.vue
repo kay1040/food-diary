@@ -11,7 +11,7 @@
         <li><a href="/user/food-diary">Food diary</a></li>
         <li><a href="/user/information">User Information</a></li>
         <li><a href="/user/password">Change Password</a></li>
-        <li><a href="/">Log out</a></li>
+        <li><a href="/" @click="auth.logout">Log out</a></li>
       </ul>
     </div>
   </header>
@@ -20,7 +20,10 @@
 <script setup>
 import { ref, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '../stores/auth'
+
 const router = useRouter()
+const auth = useAuthStore()
 
 const isShowHeaderColor = ref(true)
 const isShowUserIcon = ref(true)
@@ -95,7 +98,7 @@ header {
       li {
         height: 40px;
         line-height: 40px;
-        padding: 0 30px;     
+        padding: 0 30px;
 
         a {
           display: inline-block;

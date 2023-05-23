@@ -12,11 +12,20 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import router from '../router';
-const title = "Healthy eating is a journey, not a destination.\nLet's enjoy the ride!"
+import { useAuthStore } from '../stores/auth'
+
+const title = "Healthy eating is a jouney, not a destination.\nLet's enjoy the ride!"
 let buttonVisible = ref('hidden')
 
+
 const goToStart = () => {
-  router.push({ name: 'auth-form' })
+  const auth = useAuthStore()
+  if (auth.isLoggedIn) {
+    router.push({ name: 'food-diary' })
+  } else {
+    router.push({ name: 'auth-form' })
+  }
+
 }
 
 onMounted(() => {

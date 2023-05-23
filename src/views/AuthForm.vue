@@ -12,7 +12,7 @@
         <h2>SIGN UP</h2>
         <input type="email" placeholder="Email Address" v-model="email">
         <input type="password" placeholder="Password" v-model="password">
-        <input type="password" placeholder="Confirm Password" v-model="passwordConfirmation">
+        <input type="password" placeholder="Confirm Password" v-model="confirmPassword">
         <button class="login-btn">SIGN UP</button>
         <p class="toggle-from">Already have an account? <span @click="isLoginForm = !isLoginForm">Login in.</span></p>
       </form>
@@ -20,15 +20,75 @@
   </div>
 </template>
 <script setup>
+import axios from 'axios';
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '../stores/auth'
+
 const router = useRouter()
 const isLoginForm = ref(true)
-const handleSubmit = () => {
+
+const email = ref('')
+const password = ref('')
+const confirmPassword = ref('')
+
+const auth = useAuthStore()
+
+const handleSubmit = async () => {
   if (isLoginForm.value) {
-    router.push({ name: 'profile' })
+    // login 
+    try {
+      console.log('email', email.value);
+      console.log('password', password.value);
+      const res = await axios.post('http://127.0.0.1:3000/api/login', { email: email.value, password: password.value })
+      // const res = await axios.post('http://localhost:1337/api/auth/local', { identifier: email.value, password: password.value }) // use strapi
+      const token = res.data.token
+      const user = res.data.email
+      console.log(res);
+      console.log(token);
+      auth.login(token, user)
+      router.push({ name: 'userInfo' })
+    } catch (error) {
+      console.log(error);
+      if (error.response) {
+        ElMessage({
+          showClose: true,
+          message: error.response.data.message,
+          type: 'error'
+        })
+      } else {
+        ElMessage({
+          showClose: true,
+          message: error.message,
+          type: 'error'
+        })
+      }
+    }
+
   } else {
-    router.push({ name: 'start' })
+    // signup
+    try {
+      if (password.value === confirmPassword.value) {
+        await axios.post('http://127.0.0.1:3000/api/signup', { email: email.value, password: password.value })
+        router.push({ name: 'start' })
+      } else {
+        throw new Error('Password and Confirm Password does not match!')
+      }
+    } catch (error) {
+      if (error.response) {
+        ElMessage({
+          showClose: true,
+          message: error.response.data.message,
+          type: 'error'
+        })
+      } else {
+        ElMessage({
+          showClose: true,
+          message: error.message,
+          type: 'error'
+        })
+      }
+    }
   }
 }
 </script>
