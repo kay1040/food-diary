@@ -50,10 +50,9 @@ if (window.matchMedia('(max-width: 768px)').matches) {
   dialogWidth.value = '90%';
 }
 
-const foodData = reactive({ id: nanoid(), name: '', calories: '' })
+const foodData = reactive({ id: '', name: '', calories: '' })
 
 const handleSearch = async (food) => {
-  ;
   try {
     const response = await axios.get('https://api.nal.usda.gov/fdc/v1/foods/search', {
       params: {
@@ -83,12 +82,13 @@ watchEffect(() => {
 const handleSubmit = (formRef, foodData) => {
   formRef.validate(async (valid) => {
     if (valid) {
-      emits('on-close')
       if (props.title === 'ADD FOOD') {
+        foodData.id = nanoid()
         emits('on-add', foodData)
       } else {
         emits('on-edit', foodData)
       }
+      emits('on-close')
       formRef.resetFields()
     } else {
       ElMessage({

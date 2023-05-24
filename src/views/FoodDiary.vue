@@ -3,7 +3,7 @@
     @on-add="handleAddFood" @on-edit="handleEditFood" />
   <div class="food-diary">
     <div class="calender">
-      <Calendar @selected-day="getSelectedDay" :fake-data="fakeData" />
+      <Calendar @selected-day="getSelectedDay" :fake-data="userFoodsData" />
     </div>
     <div class="details" v-if="selectedDay">
       <div>
@@ -30,64 +30,44 @@
       <div v-if="getFoodsDataBySelectedDay()">
         <div class="calories">
           <span>Total calories</span>
-          <span>{{ fakeData.find(item => item.date === selectedDay)?.totalCalories }} kcal</span>
+          <span>{{ userFoodsData.find(item => item.date === selectedDay)?.totalCalories }} kcal</span>
         </div>
         <div class="calories">
           <span>Remaining calories</span>
-          <span>{{ user.TDEE - fakeData.find(item => item.date === selectedDay)?.totalCalories }} kcal</span>
+          <span>{{ user.TDEE - userFoodsData.find(item => item.date === selectedDay)?.totalCalories }} kcal</span>
         </div>
       </div>
     </div>
   </div>
 </template>
+
 <script setup>
-import { ref, reactive } from 'vue'
-import { nanoid } from 'nanoid'
+import { ref, reactive, onMounted } from 'vue'
+import axios from 'axios';
 import Dialog from '../components/Dialog.vue'
 import Calendar from '../components/Calendar.vue';
 import { useUserStore } from '../stores/user'
+import { useAuthStore } from '../stores/auth'
+import { useApiErrorHandler } from '../hooks/useApiErrorHandler'
 
 const user = useUserStore()
+const auth = useAuthStore()
 
-const fakeData = reactive([
-  {
-    id: '001',
-    date: '2023-05-06',
-    foods: [
-      { id: '001', name: 'prok', calories: 92 },
-      { id: '002', name: 'milk', calories: 55 },
-      { id: '003', name: 'ice cream', calories: 200 },
-    ],
-    totalCalories: 347
-  },
-  {
-    id: '002',
-    date: '2023-05-07',
-    foods: [
-      { id: '004', name: 'steak', calories: 556 },
-      { id: '005', name: 'soup', calories: 80 },
-      { id: '006', name: 'cake', calories: 447 },
-    ],
-    totalCalories: 1083
-  },
-  {
-    id: '003',
-    date: '2023-05-08',
-    foods: [
-      { id: '007', name: 'ramen', calories: 327 },
-    ],
-    totalCalories: 327
-  },
-  {
-    id: '004',
-    date: '2023-05-09',
-    foods: [
-      { id: '008', name: 'oranges', calories: 49 },
-      { id: '009', name: 'egg', calories: 159 },
-    ],
-    totalCalories: 208
-  },
-])
+let userFoodsData = ref([])
+
+const fetchUserFoodsData = async () => {
+  try {
+    const res = await axios.get(`http://127.0.0.1:3000/api/food/${auth.userId}`)
+    userFoodsData.value = res.data.foodRecords
+    console.log(userFoodsData.value);
+  } catch (error) {
+    useApiErrorHandler(error)
+  }
+}
+
+onMounted(() => {
+  fetchUserFoodsData()
+})
 
 const dialogVisible = reactive({ value: false })
 
@@ -111,7 +91,7 @@ const handleCloseDialog = () => {
 }
 
 const getFoodsDataBySelectedDay = () => {
-  return fakeData.filter(item => item.date === selectedDay.value)[0]?.foods || null
+  return userFoodsData.value.filter(item => item.date === selectedDay.value)[0]?.foods || null
 }
 
 const handleShowAddDialog = () => {
@@ -122,60 +102,71 @@ const handleShowAddDialog = () => {
   selectedFood.calories = ''
 }
 
-const handleAddFood = (foodData) => {
-  const date = selectedDay.value
-  const index = fakeData.findIndex(item => item.date === date);
-  const isExist = index !== -1;
+const handleAddFood = async (foodData) => {
+  const date = selectedDay.value;
+  const userId = auth.userId;
 
-  if (isExist) {
-    fakeData[index].foods.push({ id: nanoid(), ...foodData })
-    fakeData[index].totalCalories += foodData.calories
-  } else {
-    fakeData.push({
-      id: nanoid(),
+  try {
+    await axios.post('http://127.0.0.1:3000/api/food/', {
+      userId,
       date,
       foods: [
         { ...foodData },
       ],
       totalCalories: foodData.calories
-    },)
+    })
+    fetchUserFoodsData()
+  } catch (error) {
+    useApiErrorHandler(error)
   }
 }
+
 
 const handleShowEditDialog = (id) => {
   dialogVisible.value = true
   dialogTitle.value = 'EDIT FOOD'
   const date = selectedDay.value
-  const index = fakeData.findIndex(item => item.date === date);
-  selectedFood.id = fakeData[index].foods.find(item => item.id === id).id
-  selectedFood.name = fakeData[index].foods.find(item => item.id === id).name
-  selectedFood.calories = fakeData[index].foods.find(item => item.id === id).calories
+  const index = userFoodsData.value.findIndex(item => item.date === date);
+  selectedFood.id = userFoodsData.value[index].foods.find(item => item.id === id).id
+  selectedFood.name = userFoodsData.value[index].foods.find(item => item.id === id).name
+  selectedFood.calories = userFoodsData.value[index].foods.find(item => item.id === id).calories
 }
 
-const handleEditFood = (foodData) => {
-  const date = selectedDay.value
-  const index = fakeData.findIndex(item => item.date === date);
-  const foodIndex = fakeData[index].foods.findIndex(item => item.id === foodData.id)
-  fakeData[index].foods[foodIndex] = { ...foodData }
-  fakeData[index].totalCalories = fakeData[index].totalCalories - selectedFood.calories + foodData.calories
-}
-
-const handleDeleteFood = (id) => {
-  ElMessageBox({
-    message: 'Are you sure to delete this food data?',
-    type: 'warning',
-    confirmButtonText: 'Delete',
-    cancelButtonText: 'Cancel',
-    showCancelButton: true,
-    closeOnClickModal: false,
-  }).then(() => {
+const handleEditFood = async (foodData) => {
+  try {
     const date = selectedDay.value
-    const index = fakeData.findIndex(item => item.date === date);
-    fakeData[index].foods = fakeData[index].foods.filter(item => item.id !== id)
-    ElMessage.success('Successfully deleted!');
-  }).catch(() => {
-    ElMessage.info('Deletion canceled!');
-  });
+    const index = userFoodsData.value.findIndex(item => item.date === date);
+    const recordId = userFoodsData.value[index]._id
+    const foods = { ...foodData }
+    const totalCalories = userFoodsData.value[index].totalCalories - selectedFood.calories + foodData.calories
+    await axios.put(`http://127.0.0.1:3000/api/food/${recordId}`, { foods, totalCalories })
+    fetchUserFoodsData()
+  } catch (error) {
+    useApiErrorHandler(error)
+  }
+}
+
+const handleDeleteFood = async (id) => {
+  try {
+    await ElMessageBox({
+      message: 'Are you sure to delete this food data?',
+      type: 'warning',
+      confirmButtonText: 'Delete',
+      cancelButtonText: 'Cancel',
+      showCancelButton: true,
+      closeOnClickModal: false,
+    })
+    const date = selectedDay.value
+    const index = userFoodsData.value.findIndex(item => item.date === date)
+    const recordId = userFoodsData.value[index]._id
+    const foods = userFoodsData.value[index].foods.filter(item => item.id !== id)
+    const totalCalories = foods.reduce((sum, food) => sum + food.calories, 0);
+    await axios.put(`http://127.0.0.1:3000/api/food/${recordId}`, { foods, totalCalories })
+    fetchUserFoodsData()
+    ElMessage.success('Successfully deleted!')
+  } catch (error) {
+    ElMessage.info('Deletion canceled!')
+  }
 }
 </script>
 
