@@ -59,7 +59,6 @@ const fetchUserFoodsData = async () => {
   try {
     const res = await axios.get(`http://127.0.0.1:3000/api/food/${auth.userId}`)
     userFoodsData.value = res.data.foodRecords
-    console.log(userFoodsData.value);
   } catch (error) {
     useApiErrorHandler(error)
   }
@@ -120,7 +119,6 @@ const handleAddFood = async (foodData) => {
     useApiErrorHandler(error)
   }
 }
-
 
 const handleShowEditDialog = (id) => {
   dialogVisible.value = true
