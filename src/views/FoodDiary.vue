@@ -3,7 +3,7 @@
     @on-add="handleAddFood" @on-edit="handleEditFood" />
   <div class="food-diary">
     <div class="calender">
-      <Calendar @selected-day="getSelectedDay" :fake-data="userFoodsData" />
+      <Calendar @selected-day="getSelectedDay" @selected-month="getSelectedMonth" :foods-data="userFoodsData" />
     </div>
     <div class="details" v-if="selectedDay">
       <div>
@@ -43,9 +43,9 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
-import axios from 'axios';
+import axios from 'axios'
 import Dialog from '../components/Dialog.vue'
-import Calendar from '../components/Calendar.vue';
+import Calendar from '../components/Calendar.vue'
 import { useUserStore } from '../stores/user'
 import { useAuthStore } from '../stores/auth'
 import { useApiErrorHandler } from '../hooks/useApiErrorHandler'
@@ -53,12 +53,27 @@ import { useApiErrorHandler } from '../hooks/useApiErrorHandler'
 const user = useUserStore()
 const auth = useAuthStore()
 
+const dialogVisible = reactive({ value: false })
+
+let dialogTitle = ref('')
+
+const currentDate = new Date()
+let year = currentDate.getFullYear()
+let month = String(currentDate.getMonth() + 1).padStart(2, '0')
+const day = String(currentDate.getDate()).padStart(2, '0')
+
+const selectedDay = ref(`${year}-${month}-${day}`)
+
 let userFoodsData = ref([])
 
 const fetchUserFoodsData = async () => {
   try {
-    const res = await axios.get(`http://127.0.0.1:3000/api/food/${auth.userId}`)
+    const userId = auth.userId
+    const res = await axios.get(`http://127.0.0.1:3000/api/food/${userId}/${year}/${month}`)
     userFoodsData.value = res.data.foodRecords
+    userFoodsData.value.forEach(item => {
+      item.date = item.date.toString().split("T")[0]
+    })
   } catch (error) {
     useApiErrorHandler(error)
   }
@@ -68,21 +83,35 @@ onMounted(() => {
   fetchUserFoodsData()
 })
 
-const dialogVisible = reactive({ value: false })
-
-let dialogTitle = ref('')
-
-const currentDate = new Date();
-const year = currentDate.getFullYear();
-const month = String(currentDate.getMonth() + 1).padStart(2, '0');
-const day = String(currentDate.getDate()).padStart(2, '0');
-
-const selectedDay = ref(`${year}-${month}-${day}`)
-
 let selectedFood = reactive({});
 
 const getSelectedDay = (day) => {
   selectedDay.value = day
+}
+
+const getSelectedMonth = (val) => {
+  switch (val) {
+    case 'next-month':
+      if (month === '12') {
+        month = '01'
+        year = year + 1
+      } else {
+        month = (month * 1 + 1).toString().padStart(2, '0')
+      }
+      break
+    case 'prev-month':
+      if (month === '01') {
+        month = '12'
+        year = year - 1
+      } else {
+        month = (month * 1 - 1).toString().padStart(2, '0')
+      }
+      break
+    case 'today':
+      month = String(currentDate.getMonth() + 1).padStart(2, '0')
+      break
+  }
+  fetchUserFoodsData()
 }
 
 const handleCloseDialog = () => {
@@ -102,8 +131,8 @@ const handleShowAddDialog = () => {
 }
 
 const handleAddFood = async (foodData) => {
-  const date = selectedDay.value;
-  const userId = auth.userId;
+  const date = selectedDay.value
+  const userId = auth.userId
 
   try {
     await axios.post('http://127.0.0.1:3000/api/food/', {
@@ -133,9 +162,11 @@ const handleShowEditDialog = (id) => {
 const handleEditFood = async (foodData) => {
   try {
     const date = selectedDay.value
-    const index = userFoodsData.value.findIndex(item => item.date === date);
+    const index = userFoodsData.value.findIndex(item => item.date === date)
+    const foodIndex = userFoodsData.value[index].foods.findIndex(item => item.id === foodData.id)
+    userFoodsData.value[index].foods[foodIndex] = { ...foodData }
     const recordId = userFoodsData.value[index]._id
-    const foods = { ...foodData }
+    const foods = userFoodsData.value[index].foods
     const totalCalories = userFoodsData.value[index].totalCalories - selectedFood.calories + foodData.calories
     await axios.put(`http://127.0.0.1:3000/api/food/${recordId}`, { foods, totalCalories })
     fetchUserFoodsData()
@@ -158,7 +189,7 @@ const handleDeleteFood = async (id) => {
     const index = userFoodsData.value.findIndex(item => item.date === date)
     const recordId = userFoodsData.value[index]._id
     const foods = userFoodsData.value[index].foods.filter(item => item.id !== id)
-    const totalCalories = foods.reduce((sum, food) => sum + food.calories, 0);
+    const totalCalories = foods.reduce((sum, food) => sum + food.calories, 0)
     await axios.put(`http://127.0.0.1:3000/api/food/${recordId}`, { foods, totalCalories })
     fetchUserFoodsData()
     ElMessage.success('Successfully deleted!')
