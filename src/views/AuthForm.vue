@@ -40,12 +40,9 @@ const handleSubmit = async () => {
   if (isLoginForm.value) {
     // login 
     try {
-      const res = await axios.post('http://127.0.0.1:3000/api/login', { email: email.value, password: password.value })
-      // const res = await axios.post('http://localhost:1337/api/auth/local', { identifier: email.value, password: password.value }) // use strapi
+      const res = await axios.post('http://127.0.0.1:3000/api/user/login', { email: email.value, password: password.value })
       const token = res.data.token
       const userId = res.data.userId
-      console.log(res);
-      console.log(userId);
       auth.login(token, userId)
 
       if (isNewUser.value) {
@@ -63,7 +60,7 @@ const handleSubmit = async () => {
     isNewUser.value = true
     try {
       if (password.value === confirmPassword.value) {
-        await axios.post('http://127.0.0.1:3000/api/signup', { email: email.value, password: password.value })
+        await axios.post('http://127.0.0.1:3000/api/user/signup', { email: email.value, password: password.value })
         ElMessage.success('Signup successful. Please log in again!')
         isLoginForm.value = true
       } else {
