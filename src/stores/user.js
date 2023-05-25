@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 
 export const useUserStore = defineStore('user', {
   state: () => ({
-    userData: {
+    userInfo: {
       gender: '',
       age: '',
       height: '',
@@ -12,15 +12,15 @@ export const useUserStore = defineStore('user', {
   }),
   getters: {
     BMR: state => {
-      switch (state.userData.gender) {
+      switch (state.userInfo.gender) {
         case 'male':
-          return 10 * state.userData.weight + 6.25 * state.userData.height - 5 * state.userData.age + 5
+          return 10 * state.userInfo.weight + 6.25 * state.userInfo.height - 5 * state.userInfo.age + 5
         case 'female':
-          return 10 * state.userData.weight + 6.25 * state.userData.height - 5 * state.userData.age - 161
+          return 10 * state.userInfo.weight + 6.25 * state.userInfo.height - 5 * state.userInfo.age - 161
       }
     },
     TDEE: state => {
-      switch (state.userData.activityLevel) {
+      switch (state.userInfo.activityLevel) {
         case 'sedentary':
           return Math.round(state.BMR * 1.2)
         case 'lightly':
@@ -36,8 +36,8 @@ export const useUserStore = defineStore('user', {
 
   },
   actions: {
-    updateUserData(newData) {
-      this.userData = newData
+    updateUserInfo(newVal) {
+      this.userInfo = newVal
     },
   },
   persist: true
