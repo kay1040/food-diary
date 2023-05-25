@@ -1,13 +1,13 @@
 <template>
-  <div class="profile">
-    <div class="content">
+  <div class="user-info">
+    <div class="wrapper">
       <div class="user-data" v-if="!isEdit">
-        <div>E-mail: xxxx</div>
-        <div>Gender: {{ user.userData.gender }}</div>
-        <div>Age: {{ user.userData.age }}</div>
-        <div>Height: {{ user.userData.height }} cm</div>
-        <div>Weight: {{ user.userData.weight }} kg</div>
-        <div>Activity Level: {{ user.userData.activityLevel }}</div>
+        <div>E-mail: {{ userData.email }}</div>
+        <div>Gender: {{ userData.userInfo?.gender }}</div>
+        <div>Age: {{ userData.userInfo?.age }}</div>
+        <div>Height: {{ userData.userInfo?.height }} cm</div>
+        <div>Weight: {{ userData.userInfo?.weight }} kg</div>
+        <div>Activity Level: {{ userData.userInfo?.activityLevel }}</div>
         <div>BMR: {{ user.BMR }}</div>
         <div>TDEE: {{ user.TDEE }}</div>
         <button @click="isEdit = true">Edit</button>
@@ -54,27 +54,55 @@
   </div>
 </template>
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import axios from 'axios'
 import { useUserStore } from '../stores/user'
-const user = useUserStore()
+import { useAuthStore } from '../stores/auth';
+import { useApiErrorHandler } from '../hooks/useApiErrorHandler';
 
-const formData = { ...user.userData }
+const user = useUserStore()
+const auth = useAuthStore()
+
+const userId = auth.userId
+
+let userData = ref({})
+let formData = ref({})
+
+const fetchUserData = async () => {
+  try {
+    const res = await axios.get(`http://127.0.0.1:3000/api/user/${userId}`)
+    userData.value = res.data.user
+    formData.value = { ...userData.value.userInfo };
+  } catch (error) {
+    useApiErrorHandler(error)
+  }
+}
+
+onMounted(() => {
+  fetchUserData()
+})
 
 const isEdit = ref(false)
 
-const handleSubmit = () => {
-  user.updateUserData(formData)
-  isEdit.value = false
+const handleSubmit = async () => {
+  try {
+    user.updateUserInfo(formData.value)
+    await axios.put(`http://127.0.0.1:3000/api/user/${userId}`, { ...formData.value })
+    fetchUserData()
+    isEdit.value = false
+  } catch (error) {
+    useApiErrorHandler(error)
+  }
 }
 
 </script>
 <style  lang="scss" scoped>
-.profile {
+.user-info {
   padding-top: 50px;
   background-color: #ddd;
   height: 100vh;
 
-  .content {
+  .wrapper {
     width: 800px;
     background-color: #fff;
     margin: 30px auto;

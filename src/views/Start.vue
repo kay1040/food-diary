@@ -49,12 +49,16 @@
 <script setup>
 import { reactive, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import axios from 'axios'
 import { useUserStore } from '../stores/user'
+import { useAuthStore } from '../stores/auth'
+import { useApiErrorHandler } from '../hooks/useApiErrorHandler'
 
 const router = useRouter()
 const user = useUserStore()
+const auth = useAuthStore()
 
-const isShowNextStep = ref(true);
+const isShowNextStep = ref(true)
 const isShowPrevBtn = ref(false)
 
 let current = ref(0)
@@ -93,28 +97,34 @@ const steps = reactive([
 
 const handlePrevStep = () => {
   if (current.value > 0) {
-    isShowNextStep.value = false;
+    isShowNextStep.value = false
     setTimeout(() => {
       current.value = current.value - 1
-      isShowNextStep.value = true;
+      isShowNextStep.value = true
     }, 200)
   }
 }
 
 const handleNextStep = async () => {
   if (current.value < steps.length - 1) {
-    isShowNextStep.value = false;
+    isShowNextStep.value = false
     setTimeout(() => {
       current.value = current.value + 1
-      isShowNextStep.value = true;
+      isShowNextStep.value = true
     }, 200)
   } else {
-    user.userData.gender = steps[0].answer
-    user.userData.age = steps[1].answer
-    user.userData.height = steps[2].answer
-    user.userData.weight = steps[3].answer
-    user.userData.activityLevel = steps[4].answer
-    router.push({ name: 'userInfo' })
+    try {
+      const userId = auth.userId
+      user.userInfo.gender = steps[0].answer
+      user.userInfo.age = steps[1].answer
+      user.userInfo.height = steps[2].answer
+      user.userInfo.weight = steps[3].answer
+      user.userInfo.activityLevel = steps[4].answer
+      await axios.post('http://127.0.0.1:3000/api/user', { userId, ...user.userInfo })
+      router.push({ name: 'userInfo' })
+    } catch (error) {
+      useApiErrorHandler(error)
+    }
   }
 }
 
@@ -217,7 +227,7 @@ watch(current, (newVal) => {
       }
 
       :deep(.el-input) {
-          width: 100%;
+        width: 100%;
       }
     }
 
@@ -248,6 +258,7 @@ watch(current, (newVal) => {
       background-color: #fff;
       font-size: 20px;
       cursor: pointer;
+
       @include mobile {
         bottom: 1.6rem;
       }
