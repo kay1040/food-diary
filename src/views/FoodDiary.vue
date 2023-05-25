@@ -98,6 +98,7 @@ const getSelectedMonth = (val) => {
       } else {
         month = (month * 1 + 1).toString().padStart(2, '0')
       }
+      selectedDay.value = `${year}-${month}-01`
       break
     case 'prev-month':
       if (month === '01') {
@@ -106,9 +107,12 @@ const getSelectedMonth = (val) => {
       } else {
         month = (month * 1 - 1).toString().padStart(2, '0')
       }
+      selectedDay.value = `${year}-${month}-01`
       break
     case 'today':
       month = String(currentDate.getMonth() + 1).padStart(2, '0')
+      year = currentDate.getFullYear()
+      selectedDay.value = `${year}-${month}-${day}`
       break
   }
   fetchUserFoodsData()
@@ -272,8 +276,6 @@ const handleDeleteFood = async (id) => {
             color: #697785;
           }
         }
-
-
       }
     }
 
