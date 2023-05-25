@@ -72,7 +72,8 @@ const fetchUserData = async () => {
   try {
     const res = await axios.get(`http://127.0.0.1:3000/api/user/${userId}`)
     userData.value = res.data.user
-    formData.value = { ...userData.value.userInfo };
+    formData.value = { ...userData.value.userInfo }
+    user.updateUserInfo(formData.value)
   } catch (error) {
     useApiErrorHandler(error)
   }

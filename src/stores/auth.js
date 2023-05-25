@@ -21,6 +21,7 @@ export const useAuthStore = defineStore('auth', {
       this.userId = null
       this.token = ''
       this.expirationTime = 0
+      localStorage.removeItem('user')
     },
   },
   persist: true
