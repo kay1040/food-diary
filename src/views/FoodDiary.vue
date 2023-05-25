@@ -60,7 +60,7 @@ let dialogTitle = ref('')
 const currentDate = new Date()
 let year = currentDate.getFullYear()
 let month = String(currentDate.getMonth() + 1).padStart(2, '0')
-const day = String(currentDate.getDate()).padStart(2, '0')
+let day = String(currentDate.getDate()).padStart(2, '0')
 
 const selectedDay = ref(`${year}-${month}-${day}`)
 
@@ -87,6 +87,10 @@ let selectedFood = reactive({});
 
 const getSelectedDay = (day) => {
   selectedDay.value = day
+  year = selectedDay.value.split('-')[0]
+  month = selectedDay.value.split('-')[1]
+  day = selectedDay.value.split('-')[2]
+  fetchUserFoodsData()
 }
 
 const getSelectedMonth = (val) => {
@@ -98,7 +102,7 @@ const getSelectedMonth = (val) => {
       } else {
         month = (month * 1 + 1).toString().padStart(2, '0')
       }
-      selectedDay.value = `${year}-${month}-01`
+      day = '01'
       break
     case 'prev-month':
       if (month === '01') {
@@ -107,14 +111,15 @@ const getSelectedMonth = (val) => {
       } else {
         month = (month * 1 - 1).toString().padStart(2, '0')
       }
-      selectedDay.value = `${year}-${month}-01`
+      day = 1
       break
     case 'today':
       month = String(currentDate.getMonth() + 1).padStart(2, '0')
       year = currentDate.getFullYear()
-      selectedDay.value = `${year}-${month}-${day}`
+      day = String(currentDate.getDate()).padStart(2, '0')
       break
   }
+  selectedDay.value = `${year}-${month}-${day}`
   fetchUserFoodsData()
 }
 
