@@ -2,25 +2,27 @@
   <div class="password">
     <div class="wrapper">
       <form class="password-form">
-        <div>
-          <label for="current-password">Current Password: </label>
-          <input name="current-password" id="current-password" type="password" v-model="currentPassword">
+        <div class="details">
+          <div><label for="current-password">Current Password: </label></div>
+          <div><input name="current-password" id="current-password" type="password" v-model="currentPassword"></div>
+        </div>
+        <div class="details">
+          <div><label for="new-password">New Password: </label></div>
+          <div><input name="new-password" id="new-password" type="password" v-model="newPassword"></div>
+        </div>
+        <div class="details">
+          <div><label for="confirm-password">Confirm Password: </label></div>
+          <div><input name="confirm-password" id="confirm-password" type="password" v-model.number="confirmPassword">
+          </div>
         </div>
         <div>
-          <label for="new-password">New Password: </label>
-          <input name="new-password" id="new-password" type="password" v-model="newPassword">
-        </div>
-        <div>
-          <label for="confirm-password">Confirm Password: </label>
-          <input name="confirm-password" id="confirm-password" type="password" v-model.number="confirmPassword">
-        </div>
-        <div>
-          <button @click.prevent="handleSubmit">Submit</button>
+          <button class="form-btn" @click.prevent="handleSubmit">Submit</button>
         </div>
       </form>
     </div>
   </div>
 </template>
+
 <script setup>
 import { ref } from 'vue'
 import axios from 'axios'
@@ -37,7 +39,7 @@ const confirmPassword = ref('')
 const handleSubmit = async () => {
   try {
     if (newPassword.value === confirmPassword.value) {
-      
+
       const userId = auth.userId
       await axios.put('http://127.0.0.1:3000/api/user/password', {
         userId,
@@ -75,16 +77,17 @@ const handleSubmit = async () => {
     }
 
     .password-form {
-      div {
-        text-align: left;
+      .details {
         font-size: 16x;
-        padding: 8px;
         color: #555;
-      }
+        display: flex;
 
+        div {
+          padding: 8px;
+          width: 180px;
+        }
+      }
     }
   }
-
-
 }
 </style>
