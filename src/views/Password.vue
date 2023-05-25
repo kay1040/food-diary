@@ -36,7 +36,6 @@ const confirmPassword = ref('')
 
 const handleSubmit = async () => {
   try {
-    console.log(newPassword.value , confirmPassword.value)
     if (newPassword.value === confirmPassword.value) {
       
       const userId = auth.userId

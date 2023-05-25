@@ -83,7 +83,7 @@ onMounted(() => {
   fetchUserFoodsData()
 })
 
-let selectedFood = reactive({});
+let selectedFood = reactive({})
 
 const getSelectedDay = (day) => {
   selectedDay.value = day

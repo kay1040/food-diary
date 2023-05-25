@@ -11,7 +11,7 @@
 
 <script setup>
 import { onMounted, ref } from 'vue'
-import router from '../router';
+import router from '../router'
 import { useAuthStore } from '../stores/auth'
 
 const title = "Healthy eating is a jouney, not a destination.\nLet's enjoy the ride!"
@@ -30,7 +30,7 @@ const goToStart = () => {
 
 onMounted(() => {
   setTimeout(() => {
-    buttonVisible.value = 'visible';
+    buttonVisible.value = 'visible'
   }, title.length * 50 + 2000);
 
 })

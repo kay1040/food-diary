@@ -54,11 +54,11 @@
   </div>
 </template>
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import { useUserStore } from '../stores/user'
-import { useAuthStore } from '../stores/auth';
-import { useApiErrorHandler } from '../hooks/useApiErrorHandler';
+import { useAuthStore } from '../stores/auth'
+import { useApiErrorHandler } from '../hooks/useApiErrorHandler'
 
 const user = useUserStore()
 const auth = useAuthStore()
