@@ -35,15 +35,21 @@ const password = ref('')
 const confirmPassword = ref('')
 
 const auth = useAuthStore()
+const token = auth.token
+const config = {
+  headers: {
+    Authorization: `Bearer ${token}`
+  }
+}
 
 const handleSubmit = async () => {
   if (isLoginForm.value) {
     // login 
     try {
-      const res = await axios.post('http://127.0.0.1:3000/api/user/login', { email: email.value, password: password.value })
+      const res = await axios.post('http://127.0.0.1:3000/api/user/login', { email: email.value, password: password.value }, config)
       const token = res.data.token
       const userId = res.data.userId
-      auth.login(token, userId)
+      auth.login(token, userId, expiresIn)
 
       if (isNewUser.value) {
         router.push({ name: 'start' })
@@ -60,7 +66,7 @@ const handleSubmit = async () => {
     isNewUser.value = true
     try {
       if (password.value === confirmPassword.value) {
-        await axios.post('http://127.0.0.1:3000/api/user/signup', { email: email.value, password: password.value })
+        await axios.post('http://127.0.0.1:3000/api/user/signup', { email: email.value, password: password.value }, config)
         ElMessage.success('Signup successful. Please log in again!')
         isLoginForm.value = true
       } else {

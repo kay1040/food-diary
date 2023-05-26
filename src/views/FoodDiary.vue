@@ -53,6 +53,13 @@ import { useApiErrorHandler } from '../hooks/useApiErrorHandler'
 const user = useUserStore()
 const auth = useAuthStore()
 
+const token = auth.token
+const config = {
+  headers: {
+    Authorization: `Bearer ${token}`
+  }
+}
+
 const dialogVisible = reactive({ value: false })
 
 let dialogTitle = ref('')
@@ -69,7 +76,7 @@ let userFoodsData = ref([])
 const fetchUserFoodsData = async () => {
   try {
     const userId = auth.userId
-    const res = await axios.get(`http://127.0.0.1:3000/api/food/${userId}/${year}/${month}`)
+    const res = await axios.get(`http://127.0.0.1:3000/api/food/${userId}/${year}/${month}`, config)
     userFoodsData.value = res.data.foodRecords
     userFoodsData.value.forEach(item => {
       item.date = item.date.toString().split("T")[0]
@@ -151,7 +158,7 @@ const handleAddFood = async (foodData) => {
         { ...foodData },
       ],
       totalCalories: foodData.calories
-    })
+    }, config)
     fetchUserFoodsData()
   } catch (error) {
     useApiErrorHandler(error)
@@ -177,7 +184,7 @@ const handleEditFood = async (foodData) => {
     const recordId = userFoodsData.value[index]._id
     const foods = userFoodsData.value[index].foods
     const totalCalories = userFoodsData.value[index].totalCalories - selectedFood.calories + foodData.calories
-    await axios.put(`http://127.0.0.1:3000/api/food/${recordId}`, { foods, totalCalories })
+    await axios.put(`http://127.0.0.1:3000/api/food/${recordId}`, { foods, totalCalories }, config)
     fetchUserFoodsData()
   } catch (error) {
     useApiErrorHandler(error)
@@ -199,7 +206,7 @@ const handleDeleteFood = async (id) => {
     const recordId = userFoodsData.value[index]._id
     const foods = userFoodsData.value[index].foods.filter(item => item.id !== id)
     const totalCalories = foods.reduce((sum, food) => sum + food.calories, 0)
-    await axios.put(`http://127.0.0.1:3000/api/food/${recordId}`, { foods, totalCalories })
+    await axios.put(`http://127.0.0.1:3000/api/food/${recordId}`, { foods, totalCalories }, config)
     fetchUserFoodsData()
     ElMessage.success('Successfully deleted!')
   } catch (error) {

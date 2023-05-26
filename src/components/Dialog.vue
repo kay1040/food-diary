@@ -47,18 +47,20 @@ const formRef = ref(null)
 let dialogWidth = ref('60%')
 
 if (window.matchMedia('(max-width: 768px)').matches) {
-  dialogWidth.value = '90%';
+  dialogWidth.value = '90%'
 }
 
 const foodData = reactive({ id: '', name: '', calories: '' })
 
 const handleSearch = async (food) => {
   try {
+    const api_key = import.meta.env.VITE_SOME_API_KEY
+
     const response = await axios.get('https://api.nal.usda.gov/fdc/v1/foods/search', {
       params: {
         query: food,
         pageSize: 1,
-        api_key: process.env.API_KEY
+        api_key,
       }
     })
     if (response.status === 200) {

@@ -32,6 +32,13 @@ import { useApiErrorHandler } from '../hooks/useApiErrorHandler'
 
 const router = useRouter()
 const auth = useAuthStore()
+const token = auth.token
+const config = {
+  headers: {
+    Authorization: `Bearer ${token}`
+  }
+}
+
 const currentPassword = ref('')
 const newPassword = ref('')
 const confirmPassword = ref('')
@@ -45,7 +52,7 @@ const handleSubmit = async () => {
         userId,
         currentPassword: currentPassword.value,
         newPassword: newPassword.value
-      })
+      }, config)
       ElMessage.success('Password updated successfully!')
       router.push({ name: 'food-diary' })
     } else {

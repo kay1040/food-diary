@@ -13,7 +13,7 @@ export const useAuthStore = defineStore('auth', {
       this.userId = userId
       this.token = token
       const currentTime = Date.now();
-      const timeout = 1000 * 60 * 60 * 24 * 7
+      const timeout = 1000 * 60 * 60 * 3
       this.expirationTime = currentTime + timeout
     },
     logout() {
