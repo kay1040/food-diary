@@ -58,7 +58,7 @@ const handleSearch = async (food) => {
       params: {
         query: food,
         pageSize: 1,
-        api_key: 'DmWhzKnBqyxW1AiNe30edfTuhAHNniA14hxWHMs3'
+        api_key: process.env.API_KEY
       }
     })
     if (response.status === 200) {
