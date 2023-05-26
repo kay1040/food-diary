@@ -106,13 +106,19 @@ const user = useUserStore()
 const auth = useAuthStore()
 
 const userId = auth.userId
+const token = auth.token
+const config = {
+  headers: {
+    Authorization: `Bearer ${token}`
+  }
+}
 
 let userData = ref({})
 let formData = ref({})
 
 const fetchUserData = async () => {
   try {
-    const res = await axios.get(`http://127.0.0.1:3000/api/user/${userId}`)
+    const res = await axios.get(`http://127.0.0.1:3000/api/user/${userId}`, config)
     userData.value = res.data.user
     formData.value = { ...userData.value.userInfo }
     user.updateUserInfo(formData.value)
