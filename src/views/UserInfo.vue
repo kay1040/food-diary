@@ -3,42 +3,48 @@
     <div class="wrapper">
       <div class="user-data" v-if="!isEdit">
         <div class="details">
-          <div>E-mail: </div>
+          <div class="title">E-mail: </div>
           <div>{{ userData.email }}</div>
         </div>
         <div class="details">
-          <div>Gender: </div>
+          <div class="title">Gender: </div>
           <div>{{ userData.userInfo?.gender }}</div>
         </div>
         <div class="details">
-          <div> Age: </div>
+          <div class="title"> Age: </div>
           <div>{{ userData.userInfo?.age }}</div>
         </div>
         <div class="details">
-          <div>Height: </div>
+          <div class="title">Height: </div>
           <div>{{ userData.userInfo?.height }} cm</div>
         </div>
         <div class="details">
-          <div>Weight: </div>
+          <div class="title">Weight: </div>
           <div>{{ userData.userInfo?.weight }} kg</div>
         </div>
         <div class="details">
-          <div>Activity Level: </div>
+          <div class="title">Activity Level: </div>
           <div>{{ userData.userInfo?.activityLevel }}</div>
         </div>
         <div class="details">
-          <div>BMR: </div>
+          <div class="title">BMR: </div>
           <div>{{ user.BMR }}</div>
         </div>
         <div class="details">
-          <div>TDEE: </div>
+          <div class="title">TDEE: </div>
           <div>{{ user.TDEE }}</div>
         </div>
-        <button class="form-btn" @click="isEdit = true">Edit</button>
+        <div class="btn-group">
+          <button class="form-btn" @click="isEdit = true">Edit</button>
+        </div>
       </div>
       <form v-if="isEdit" class="user-form">
         <div class="details">
-          <div><label for="gender">Gender: </label></div>
+          <div class="title">E-mail: </div>
+          <div>{{ userData.email }}</div>
+        </div>
+        <div class="details">
+          <div class="title"><label for="gender">Gender: </label></div>
           <div>
             <select name="gender" id="gender" v-model="formData.gender">
               <option value="" disabled>Select</option>
@@ -48,19 +54,19 @@
           </div>
         </div>
         <div class="details">
-          <div><label for="age">Age: </label></div>
+          <div class="title"><label for="age">Age: </label></div>
           <div><input name="age" id="age" type="text" v-model.number="formData.age"></div>
         </div>
         <div class="details">
-          <div><label for="height">Height: </label></div>
+          <div class="title"><label for="height">Height: </label></div>
           <div><input name="height" id="height" type="text" v-model.number="formData.height"></div>
         </div>
         <div class="details">
-          <div><label for="weight">Weight: </label></div>
+          <div class="title"><label for="weight">Weight: </label></div>
           <div><input name="weight" id="weight" type="text" v-model.number="formData.weight"></div>
         </div>
         <div class="details">
-          <div><label for="activity">Activity Level: </label></div>
+          <div class="title"><label for="activity">Activity Level: </label></div>
           <div>
             <select name="activity" id="activity" v-model="formData.activityLevel">
               <option value="" disabled>Select</option>
@@ -73,6 +79,14 @@
           </div>
         </div>
         <div class="details">
+          <div class="title">BMR: </div>
+          <div>-</div>
+        </div>
+        <div class="details">
+          <div class="title">TDEE: </div>
+          <div>-</div>
+        </div>
+        <div class="btn-group">
           <button class="form-btn" @click.prevent="isEdit = false">Cancel</button>
           <button class="form-btn" @click.prevent="handleSubmit">Submit</button>
         </div>
@@ -146,17 +160,29 @@ const handleSubmit = async () => {
 
     .user-data,
     .user-form {
+      position: relative;
+      padding-bottom: 60px;
       .details {
         font-size: 16x;
         color: #555;
         display: flex;
 
+        .title {
+          text-align: right;
+        }
+
         div {
           padding: 8px;
-          width: 180px;
+          width: 150px;
+          height: 40px;
         }
-      }
 
+      }
+      .btn-group {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+      }
     }
   }
 }

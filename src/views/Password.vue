@@ -3,19 +3,19 @@
     <div class="wrapper">
       <form class="password-form">
         <div class="details">
-          <div><label for="current-password">Current Password: </label></div>
+          <div class="title"><label for="current-password">Current Password: </label></div>
           <div><input name="current-password" id="current-password" type="password" v-model="currentPassword"></div>
         </div>
         <div class="details">
-          <div><label for="new-password">New Password: </label></div>
+          <div class="title"><label for="new-password">New Password: </label></div>
           <div><input name="new-password" id="new-password" type="password" v-model="newPassword"></div>
         </div>
         <div class="details">
-          <div><label for="confirm-password">Confirm Password: </label></div>
+          <div class="title"><label for="confirm-password">Confirm Password: </label></div>
           <div><input name="confirm-password" id="confirm-password" type="password" v-model.number="confirmPassword">
           </div>
         </div>
-        <div>
+        <div class="btn-group">
           <button class="form-btn" @click.prevent="handleSubmit">Submit</button>
         </div>
       </form>
@@ -77,15 +77,30 @@ const handleSubmit = async () => {
     }
 
     .password-form {
+      position: relative;
+      padding-bottom: 60px;
+
       .details {
         font-size: 16x;
         color: #555;
         display: flex;
 
+        .title {
+          text-align: right;
+        }
+
         div {
           padding: 8px;
           width: 180px;
+          height: 40px;
         }
+
+      }
+
+      .btn-group {
+        position: absolute;
+        right: 0;
+        bottom: 0;
       }
     }
   }
