@@ -49,7 +49,7 @@ const handleSubmit = async () => {
       const res = await axios.post('http://127.0.0.1:3000/api/user/login', { email: email.value, password: password.value }, config)
       const token = res.data.token
       const userId = res.data.userId
-      auth.login(token, userId, expiresIn)
+      auth.login(token, userId)
 
       if (isNewUser.value) {
         router.push({ name: 'start' })
