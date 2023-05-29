@@ -1,5 +1,5 @@
 <template>
-  <Loading v-show="isLoading"/>
+  <Loading v-show="isLoading" />
   <div class="background">
     <div class="form-container">
       <form class="auth-form" @submit.prevent="handleSubmit" v-if="isLoginForm">
@@ -26,8 +26,10 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import Loading from '@/components/Loading.vue'
 import { useAuthStore } from '@/stores/auth'
+import { useUserStore } from '@/stores/user'
 import { useApiErrorHandler } from '@/hooks/useApiErrorHandler'
 import api from '@/api/axios'
+
 
 const router = useRouter()
 const isLoginForm = ref(true)
@@ -40,6 +42,7 @@ const password = ref('')
 const confirmPassword = ref('')
 
 const auth = useAuthStore()
+const user = useUserStore()
 
 const handleSubmit = async () => {
   if (isLoginForm.value) {
@@ -55,7 +58,15 @@ const handleSubmit = async () => {
         router.push({ name: 'start' })
         isNewUser.value = false
       } else {
-        router.push({ name: 'food-diary' })
+        try {
+          const res = await api.get(`/user/${userId}`)
+          user.updateUserInfo(res.user.userInfo)
+          router.push({ name: 'food-diary' })
+        } catch (error) {
+          useApiErrorHandler(error)
+        } finally {
+          isLoading.value = false
+        }
       }
 
     } catch (error) {
