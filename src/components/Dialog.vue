@@ -54,8 +54,7 @@ const foodData = reactive({ id: '', name: '', calories: '' })
 
 const handleSearch = async (food) => {
   try {
-    const api_key = import.meta.env.VITE_SOME_API_KEY
-
+    const api_key = import.meta.env.VITE_SOME_USDA_API_KEY
     const response = await axios.get('https://api.nal.usda.gov/fdc/v1/foods/search', {
       params: {
         query: food,
@@ -63,6 +62,7 @@ const handleSearch = async (food) => {
         api_key,
       }
     })
+
     if (response.status === 200) {
       foodData.calories = response.data.foods[0].foodNutrients.filter(item => item.nutrientId === 1008)[0].value
     } else {
