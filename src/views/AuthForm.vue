@@ -1,4 +1,5 @@
 <template>
+  <Loading v-show="isLoading"/>
   <div class="background">
     <div class="form-container">
       <form class="auth-form" @submit.prevent="handleSubmit" v-if="isLoginForm">
@@ -23,6 +24,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import Loading from '@/components/Loading.vue'
 import { useAuthStore } from '@/stores/auth'
 import { useApiErrorHandler } from '@/hooks/useApiErrorHandler'
 import api from '@/api/axios'
@@ -30,6 +32,8 @@ import api from '@/api/axios'
 const router = useRouter()
 const isLoginForm = ref(true)
 const isNewUser = ref(false)
+
+const isLoading = ref(false)
 
 const email = ref('')
 const password = ref('')
@@ -41,8 +45,8 @@ const handleSubmit = async () => {
   if (isLoginForm.value) {
     // login 
     try {
+      isLoading.value = true
       const res = await api.post('/user/login', { email: email.value, password: password.value })
-      console.log(res);
       const token = res.token
       const userId = res.userId
       auth.login(token, userId)
@@ -56,11 +60,14 @@ const handleSubmit = async () => {
 
     } catch (error) {
       useApiErrorHandler(error)
+    } finally {
+      isLoading.value = false
     }
   } else {
     // signup
     isNewUser.value = true
     try {
+      isLoading.value = true
       if (password.value === confirmPassword.value) {
         await api.post('/user/signup', { email: email.value, password: password.value })
         ElMessage.success('Signup successful. Please log in again!')
@@ -70,6 +77,8 @@ const handleSubmit = async () => {
       }
     } catch (error) {
       useApiErrorHandler(error)
+    } finally {
+      isLoading.value = false
     }
   }
 }

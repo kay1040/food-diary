@@ -1,5 +1,6 @@
 <template>
-  <div class="user-info">
+  <Loading v-show="isLoading"/>
+  <div class="user-info" v-show="!isLoading">
     <div class="wrapper">
       <div class="user-data" v-if="!isEdit">
         <div class="details">
@@ -98,6 +99,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import Loading from '@/components/Loading.vue'
 import { useUserStore } from '@/stores/user'
 import { useAuthStore } from '@/stores/auth'
 import { useApiErrorHandler } from '@/hooks/useApiErrorHandler'
@@ -108,17 +110,22 @@ const auth = useAuthStore()
 
 const userId = auth.userId
 
+const isLoading = ref(false)
+
 let userData = ref({})
 let formData = ref({})
 
 const fetchUserData = async () => {
   try {
+    isLoading.value = true
     const res = await api.get(`/user/${userId}`)
     userData.value = res.user
     formData.value = { ...userData.value.userInfo }
     user.updateUserInfo(formData.value)
   } catch (error) {
     useApiErrorHandler(error)
+  } finally {
+    isLoading.value = false
   }
 }
 
@@ -144,6 +151,7 @@ const handleSubmit = async () => {
 }
 
 </script>
+
 <style  lang="scss" scoped>
 .user-info {
   padding-top: 50px;

@@ -1,21 +1,21 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useAuthStore } from '../stores/auth'
+import { useAuthStore } from '@/stores/auth'
 
 const routes = [
   {
     path: '/',
     name: 'home',
-    component: () => import('../views/Home.vue'),
+    component: () => import('@/views/Home.vue'),
   },
   {
     path: '/auth-form',
     name: 'auth-form',
-    component: () => import('../views/AuthForm.vue'),
+    component: () => import('@/views/AuthForm.vue'),
   },
   {
     path: '/user/information',
     name: 'userInfo',
-    component: () => import('../views/UserInfo.vue'),
+    component: () => import('@/views/UserInfo.vue'),
     meta: {
       requiresAuth: true,
     },
@@ -23,7 +23,7 @@ const routes = [
   {
     path: '/user/password',
     name: 'password',
-    component: () => import('../views/Password.vue'),
+    component: () => import('@/views/Password.vue'),
     meta: {
       requiresAuth: true,
     },
@@ -31,7 +31,7 @@ const routes = [
   {
     path: '/start',
     name: 'start',
-    component: () => import('../views/Start.vue'),
+    component: () => import('@/views/Start.vue'),
     meta: {
       requiresAuth: true,
     },
@@ -39,7 +39,7 @@ const routes = [
   {
     path: '/user/food-diary',
     name: 'food-diary',
-    component: () => import('../views/FoodDiary.vue'),
+    component: () => import('@/views/FoodDiary.vue'),
     meta: {
       requiresAuth: true,
     },

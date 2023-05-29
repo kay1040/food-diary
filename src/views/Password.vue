@@ -1,4 +1,5 @@
 <template>
+  <Loading v-show="isLoading" />
   <div class="password">
     <div class="wrapper">
       <form class="password-form">
@@ -25,6 +26,7 @@
 
 <script setup>
 import { ref } from 'vue'
+import Loading from '@/components/Loading.vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useApiErrorHandler } from '@/hooks/useApiErrorHandler'
@@ -33,12 +35,15 @@ import api from '@/api/axios'
 const router = useRouter()
 const auth = useAuthStore()
 
+const isLoading = ref(false)
+
 const currentPassword = ref('')
 const newPassword = ref('')
 const confirmPassword = ref('')
 
 const handleSubmit = async () => {
   try {
+    isLoading.value = true
     if (newPassword.value === confirmPassword.value) {
       const userId = auth.userId
       await api.put('/user/password', {
@@ -53,6 +58,8 @@ const handleSubmit = async () => {
     }
   } catch (error) {
     useApiErrorHandler(error)
+  } finally {
+    isLoading.value = false
   }
 }
 </script>

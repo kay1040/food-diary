@@ -1,4 +1,5 @@
 <template>
+  <Loading v-show="isLoading"/>
   <Dialog :dialog-visible="dialogVisible" :title="dialogTitle" :selected-food="selectedFood" @on-close="handleCloseDialog"
     @on-add="handleAddFood" @on-edit="handleEditFood" />
   <div class="food-diary">
@@ -43,6 +44,7 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
+import Loading from '@/components/Loading.vue'
 import Dialog from '@/components/Dialog.vue'
 import Calendar from '@/components/Calendar.vue'
 import { useUserStore } from '@/stores/user'
@@ -52,6 +54,8 @@ import api from '@/api/axios'
 
 const user = useUserStore()
 const auth = useAuthStore()
+
+const isLoading = ref(true)
 
 const dialogVisible = reactive({ value: false })
 
@@ -68,6 +72,7 @@ let userFoodsData = ref([])
 
 const fetchUserFoodsData = async () => {
   try {
+    isLoading.value = true
     const userId = auth.userId
     const res = await api.get(`/food/${userId}/${year}/${month}`)
     userFoodsData.value = res.foodRecords
@@ -76,6 +81,8 @@ const fetchUserFoodsData = async () => {
     })
   } catch (error) {
     useApiErrorHandler(error)
+  } finally {
+    isLoading.value = false
   }
 }
 
@@ -142,7 +149,6 @@ const handleShowAddDialog = () => {
 const handleAddFood = async (foodData) => {
   const date = selectedDay.value
   const userId = auth.userId
-
   try {
     await api.post('/food/', {
       userId,
@@ -178,7 +184,7 @@ const handleEditFood = async (foodData) => {
     const foods = userFoodsData.value[index].foods
     const totalCalories = userFoodsData.value[index].totalCalories - selectedFood.calories + foodData.calories
     await api.put(`/food/${recordId}`, { foods, totalCalories })
-    fetchUserFoodsData()
+    await fetchUserFoodsData()
   } catch (error) {
     useApiErrorHandler(error)
   }
