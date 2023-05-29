@@ -43,22 +43,15 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
-import axios from 'axios'
-import Dialog from '../components/Dialog.vue'
-import Calendar from '../components/Calendar.vue'
-import { useUserStore } from '../stores/user'
-import { useAuthStore } from '../stores/auth'
-import { useApiErrorHandler } from '../hooks/useApiErrorHandler'
+import Dialog from '@/components/Dialog.vue'
+import Calendar from '@/components/Calendar.vue'
+import { useUserStore } from '@/stores/user'
+import { useAuthStore } from '@/stores/auth'
+import { useApiErrorHandler } from '@/hooks/useApiErrorHandler'
+import api from '@/api/axios'
 
 const user = useUserStore()
 const auth = useAuthStore()
-
-const token = auth.token
-const config = {
-  headers: {
-    Authorization: `Bearer ${token}`
-  }
-}
 
 const dialogVisible = reactive({ value: false })
 
@@ -76,8 +69,8 @@ let userFoodsData = ref([])
 const fetchUserFoodsData = async () => {
   try {
     const userId = auth.userId
-    const res = await axios.get(`http://127.0.0.1:3000/api/food/${userId}/${year}/${month}`, config)
-    userFoodsData.value = res.data.foodRecords
+    const res = await api.get(`/food/${userId}/${year}/${month}`)
+    userFoodsData.value = res.foodRecords
     userFoodsData.value.forEach(item => {
       item.date = item.date.toString().split("T")[0]
     })
@@ -151,14 +144,14 @@ const handleAddFood = async (foodData) => {
   const userId = auth.userId
 
   try {
-    await axios.post('http://127.0.0.1:3000/api/food/', {
+    await api.post('/food/', {
       userId,
       date,
       foods: [
         { ...foodData },
       ],
       totalCalories: foodData.calories
-    }, config)
+    })
     fetchUserFoodsData()
   } catch (error) {
     useApiErrorHandler(error)
@@ -184,7 +177,7 @@ const handleEditFood = async (foodData) => {
     const recordId = userFoodsData.value[index]._id
     const foods = userFoodsData.value[index].foods
     const totalCalories = userFoodsData.value[index].totalCalories - selectedFood.calories + foodData.calories
-    await axios.put(`http://127.0.0.1:3000/api/food/${recordId}`, { foods, totalCalories }, config)
+    await api.put(`/food/${recordId}`, { foods, totalCalories })
     fetchUserFoodsData()
   } catch (error) {
     useApiErrorHandler(error)
@@ -206,7 +199,7 @@ const handleDeleteFood = async (id) => {
     const recordId = userFoodsData.value[index]._id
     const foods = userFoodsData.value[index].foods.filter(item => item.id !== id)
     const totalCalories = foods.reduce((sum, food) => sum + food.calories, 0)
-    await axios.put(`http://127.0.0.1:3000/api/food/${recordId}`, { foods, totalCalories }, config)
+    await api.put(`/food/${recordId}`, { foods, totalCalories })
     fetchUserFoodsData()
     ElMessage.success('Successfully deleted!')
   } catch (error) {
@@ -269,7 +262,6 @@ const handleDeleteFood = async (id) => {
 
     .list {
       margin: 20px 0;
-
 
       li {
         padding: 6px;

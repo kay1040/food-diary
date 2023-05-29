@@ -19,12 +19,13 @@
     </div>
   </div>
 </template>
+
 <script setup>
-import axios from 'axios';
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useAuthStore } from '../stores/auth'
-import { useApiErrorHandler } from '../hooks/useApiErrorHandler';
+import { useAuthStore } from '@/stores/auth'
+import { useApiErrorHandler } from '@/hooks/useApiErrorHandler'
+import api from '@/api/axios'
 
 const router = useRouter()
 const isLoginForm = ref(true)
@@ -35,20 +36,15 @@ const password = ref('')
 const confirmPassword = ref('')
 
 const auth = useAuthStore()
-const token = auth.token
-const config = {
-  headers: {
-    Authorization: `Bearer ${token}`
-  }
-}
 
 const handleSubmit = async () => {
   if (isLoginForm.value) {
     // login 
     try {
-      const res = await axios.post('http://127.0.0.1:3000/api/user/login', { email: email.value, password: password.value }, config)
-      const token = res.data.token
-      const userId = res.data.userId
+      const res = await api.post('/user/login', { email: email.value, password: password.value })
+      console.log(res);
+      const token = res.token
+      const userId = res.userId
       auth.login(token, userId)
 
       if (isNewUser.value) {
@@ -66,7 +62,7 @@ const handleSubmit = async () => {
     isNewUser.value = true
     try {
       if (password.value === confirmPassword.value) {
-        await axios.post('http://127.0.0.1:3000/api/user/signup', { email: email.value, password: password.value }, config)
+        await api.post('/user/signup', { email: email.value, password: password.value })
         ElMessage.success('Signup successful. Please log in again!')
         isLoginForm.value = true
       } else {

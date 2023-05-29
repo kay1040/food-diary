@@ -49,10 +49,9 @@
 <script setup>
 import { reactive, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
-import { useUserStore } from '../stores/user'
-import { useAuthStore } from '../stores/auth'
-import { useApiErrorHandler } from '../hooks/useApiErrorHandler'
+import { useUserStore } from '@/stores/user'
+import { useAuthStore } from '@/stores/auth'
+import { useApiErrorHandler } from '@/hooks/useApiErrorHandler'
 
 const router = useRouter()
 const user = useUserStore()
@@ -120,7 +119,7 @@ const handleNextStep = async () => {
       user.userInfo.height = steps[2].answer
       user.userInfo.weight = steps[3].answer
       user.userInfo.activityLevel = steps[4].answer
-      await axios.post('http://127.0.0.1:3000/api/user', { userId, ...user.userInfo })
+      await api.post('/user', { userId, ...user.userInfo })
       router.push({ name: 'userInfo' })
     } catch (error) {
       useApiErrorHandler(error)

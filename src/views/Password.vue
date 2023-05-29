@@ -25,19 +25,13 @@
 
 <script setup>
 import { ref } from 'vue'
-import axios from 'axios'
 import { useRouter } from 'vue-router'
-import { useAuthStore } from '../stores/auth'
-import { useApiErrorHandler } from '../hooks/useApiErrorHandler'
+import { useAuthStore } from '@/stores/auth'
+import { useApiErrorHandler } from '@/hooks/useApiErrorHandler'
+import api from '@/api/axios'
 
 const router = useRouter()
 const auth = useAuthStore()
-const token = auth.token
-const config = {
-  headers: {
-    Authorization: `Bearer ${token}`
-  }
-}
 
 const currentPassword = ref('')
 const newPassword = ref('')
@@ -46,13 +40,12 @@ const confirmPassword = ref('')
 const handleSubmit = async () => {
   try {
     if (newPassword.value === confirmPassword.value) {
-
       const userId = auth.userId
-      await axios.put('http://127.0.0.1:3000/api/user/password', {
+      await api.put('/user/password', {
         userId,
         currentPassword: currentPassword.value,
         newPassword: newPassword.value
-      }, config)
+      })
       ElMessage.success('Password updated successfully!')
       router.push({ name: 'food-diary' })
     } else {

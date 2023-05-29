@@ -95,31 +95,26 @@
 
   </div>
 </template>
+
 <script setup>
 import { ref, onMounted } from 'vue'
-import axios from 'axios'
-import { useUserStore } from '../stores/user'
-import { useAuthStore } from '../stores/auth'
-import { useApiErrorHandler } from '../hooks/useApiErrorHandler'
+import { useUserStore } from '@/stores/user'
+import { useAuthStore } from '@/stores/auth'
+import { useApiErrorHandler } from '@/hooks/useApiErrorHandler'
+import api from '@/api/axios'
 
 const user = useUserStore()
 const auth = useAuthStore()
 
 const userId = auth.userId
-const token = auth.token
-const config = {
-  headers: {
-    Authorization: `Bearer ${token}`
-  }
-}
 
 let userData = ref({})
 let formData = ref({})
 
 const fetchUserData = async () => {
   try {
-    const res = await axios.get(`http://127.0.0.1:3000/api/user/${userId}`, config)
-    userData.value = res.data.user
+    const res = await api.get(`/user/${userId}`)
+    userData.value = res.user
     formData.value = { ...userData.value.userInfo }
     user.updateUserInfo(formData.value)
   } catch (error) {
@@ -135,8 +130,12 @@ const isEdit = ref(false)
 
 const handleSubmit = async () => {
   try {
+    if (userData.value.userInfo) {
+      await api.put(`/user/${userId}`, { ...formData.value })
+    } else {
+      await api.post('/user', { userId, ...formData.value })
+    }
     user.updateUserInfo(formData.value)
-    await axios.put(`http://127.0.0.1:3000/api/user/${userId}`, { ...formData.value })
     fetchUserData()
     isEdit.value = false
   } catch (error) {
@@ -168,6 +167,7 @@ const handleSubmit = async () => {
     .user-form {
       position: relative;
       padding-bottom: 60px;
+
       .details {
         font-size: 16x;
         color: #555;
@@ -182,8 +182,8 @@ const handleSubmit = async () => {
           width: 150px;
           height: 40px;
         }
-
       }
+
       .btn-group {
         position: absolute;
         right: 0;
