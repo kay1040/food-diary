@@ -52,6 +52,7 @@ import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { useAuthStore } from '@/stores/auth'
 import { useApiErrorHandler } from '@/hooks/useApiErrorHandler'
+import api from '@/api/axios'
 
 const router = useRouter()
 const user = useUserStore()
@@ -248,6 +249,7 @@ watch(current, (newVal) => {
 
     .btn {
       position: absolute;
+      color: #333;
       bottom: 50px;
       padding-top: 5px;
       height: 30px;

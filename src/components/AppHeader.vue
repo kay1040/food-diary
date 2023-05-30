@@ -83,7 +83,6 @@ header {
     }
 
     .user-menu {
-      color: #555;
       font-size: 12px;
       position: absolute;
       top: 40px;
@@ -104,6 +103,7 @@ header {
           display: inline-block;
           width: 100%;
           font-size: 16px;
+          color: #555;
         }
 
         &:hover {

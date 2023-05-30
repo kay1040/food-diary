@@ -1,5 +1,5 @@
 <template>
-  <Loading v-show="isLoading"/>
+  <Loading />
   <Dialog :dialog-visible="dialogVisible" :title="dialogTitle" :selected-food="selectedFood" @on-close="handleCloseDialog"
     @on-add="handleAddFood" @on-edit="handleEditFood" />
   <div class="food-diary">
@@ -49,13 +49,14 @@ import Dialog from '@/components/Dialog.vue'
 import Calendar from '@/components/Calendar.vue'
 import { useUserStore } from '@/stores/user'
 import { useAuthStore } from '@/stores/auth'
+import { useLoadingStore } from '@/stores/loading'
 import { useApiErrorHandler } from '@/hooks/useApiErrorHandler'
 import api from '@/api/axios'
 
 const user = useUserStore()
 const auth = useAuthStore()
 
-const isLoading = ref(true)
+const loading = useLoadingStore()
 
 const dialogVisible = reactive({ value: false })
 
@@ -72,7 +73,7 @@ let userFoodsData = ref([])
 
 const fetchUserFoodsData = async () => {
   try {
-    isLoading.value = true
+    loading.showLoading()
     const userId = auth.userId
     const res = await api.get(`/food/${userId}/${year}/${month}`)
     userFoodsData.value = res.foodRecords
@@ -82,7 +83,7 @@ const fetchUserFoodsData = async () => {
   } catch (error) {
     useApiErrorHandler(error)
   } finally {
-    isLoading.value = false
+    loading.closeLoading()
   }
 }
 

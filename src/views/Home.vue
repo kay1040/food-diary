@@ -55,7 +55,8 @@ onMounted(() => {
     line-height: 2;
     flex-flow: column;
     background-color: rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(3px);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
 
     .title {
       font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;

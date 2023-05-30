@@ -1,38 +1,39 @@
 <template>
-  <Loading v-show="isLoading"/>
-  <div class="user-info" v-show="!isLoading">
+  <Loading />
+  <div class="user-info" v-show="!loading.isLoading">
     <div class="wrapper">
+      <h3>User Information</h3>
       <div class="user-data" v-if="!isEdit">
         <div class="details">
-          <div class="title">E-mail: </div>
+          <div>E-mail</div>
           <div>{{ userData.email }}</div>
         </div>
         <div class="details">
-          <div class="title">Gender: </div>
+          <div>Gender</div>
           <div>{{ userData.userInfo?.gender }}</div>
         </div>
         <div class="details">
-          <div class="title"> Age: </div>
+          <div> Age</div>
           <div>{{ userData.userInfo?.age }}</div>
         </div>
         <div class="details">
-          <div class="title">Height: </div>
-          <div>{{ userData.userInfo?.height }} cm</div>
+          <div>Height</div>
+          <div>{{ userData.userInfo?.height }}cm</div>
         </div>
         <div class="details">
-          <div class="title">Weight: </div>
-          <div>{{ userData.userInfo?.weight }} kg</div>
+          <div>Weight</div>
+          <div>{{ userData.userInfo?.weight }}kg</div>
         </div>
         <div class="details">
-          <div class="title">Activity Level: </div>
+          <div>Activity Level</div>
           <div>{{ userData.userInfo?.activityLevel }}</div>
         </div>
         <div class="details">
-          <div class="title">BMR: </div>
+          <div>BMR</div>
           <div>{{ user.BMR }}</div>
         </div>
         <div class="details">
-          <div class="title">TDEE: </div>
+          <div>TDEE</div>
           <div>{{ user.TDEE }}</div>
         </div>
         <div class="btn-group">
@@ -41,51 +42,35 @@
       </div>
       <form v-if="isEdit" class="user-form">
         <div class="details">
-          <div class="title">E-mail: </div>
-          <div>{{ userData.email }}</div>
+          <div>Gender</div>
+          <select name="gender" id="gender" v-model="formData.gender">
+            <option value="" disabled>Select</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+          </select>
         </div>
         <div class="details">
-          <div class="title"><label for="gender">Gender: </label></div>
-          <div>
-            <select name="gender" id="gender" v-model="formData.gender">
-              <option value="" disabled>Select</option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-            </select>
-          </div>
+          <div>Age</div>
+          <input name="age" id="age" type="text" v-model.number="formData.age">
         </div>
         <div class="details">
-          <div class="title"><label for="age">Age: </label></div>
-          <div><input name="age" id="age" type="text" v-model.number="formData.age"></div>
+          <div>Height</div>
+          <input name="height" id="height" type="text" v-model.number="formData.height">
         </div>
         <div class="details">
-          <div class="title"><label for="height">Height: </label></div>
-          <div><input name="height" id="height" type="text" v-model.number="formData.height"></div>
+          <div>Weight</div>
+          <input name="weight" id="weight" type="text" v-model.number="formData.weight">
         </div>
         <div class="details">
-          <div class="title"><label for="weight">Weight: </label></div>
-          <div><input name="weight" id="weight" type="text" v-model.number="formData.weight"></div>
-        </div>
-        <div class="details">
-          <div class="title"><label for="activity">Activity Level: </label></div>
-          <div>
-            <select name="activity" id="activity" v-model="formData.activityLevel">
-              <option value="" disabled>Select</option>
-              <option value="sedentary">Sedentary: office work, no exercise habits</option>
-              <option value="lightly">Lightly: exercise 1-2 days/week</option>
-              <option value="moderately">Moderately: exercise 3-5 days/week</option>
-              <option value="heavy">Heavy: exercise 6-7 days/week</option>
-              <option value="extremely">Extremely: athlete level, exercise 2 times a day</option>
-            </select>
-          </div>
-        </div>
-        <div class="details">
-          <div class="title">BMR: </div>
-          <div>-</div>
-        </div>
-        <div class="details">
-          <div class="title">TDEE: </div>
-          <div>-</div>
+          <div>Activity Level</div>
+          <select name="activity" id="activity" v-model="formData.activityLevel">
+            <option value="" disabled>Select</option>
+            <option value="sedentary">Sedentary: office work, no exercise habits</option>
+            <option value="lightly">Lightly: exercise 1-2 days/week</option>
+            <option value="moderately">Moderately: exercise 3-5 days/week</option>
+            <option value="heavy">Heavy: exercise 6-7 days/week</option>
+            <option value="extremely">Extremely: athlete level, exercise 2 times a day</option>
+          </select>
         </div>
         <div class="btn-group">
           <button class="form-btn" @click.prevent="isEdit = false">Cancel</button>
@@ -93,7 +78,6 @@
         </div>
       </form>
     </div>
-
   </div>
 </template>
 
@@ -102,22 +86,22 @@ import { ref, onMounted } from 'vue'
 import Loading from '@/components/Loading.vue'
 import { useUserStore } from '@/stores/user'
 import { useAuthStore } from '@/stores/auth'
+import { useLoadingStore } from '@/stores/loading'
 import { useApiErrorHandler } from '@/hooks/useApiErrorHandler'
 import api from '@/api/axios'
 
 const user = useUserStore()
 const auth = useAuthStore()
 
+
 const userId = auth.userId
-
-const isLoading = ref(false)
-
+const loading = useLoadingStore()
 let userData = ref({})
 let formData = ref({})
 
 const fetchUserData = async () => {
   try {
-    isLoading.value = true
+    loading.showLoading()
     const res = await api.get(`/user/${userId}`)
     userData.value = res.user
     formData.value = { ...userData.value.userInfo }
@@ -125,7 +109,7 @@ const fetchUserData = async () => {
   } catch (error) {
     useApiErrorHandler(error)
   } finally {
-    isLoading.value = false
+    loading.closeLoading()
   }
 }
 
@@ -159,43 +143,66 @@ const handleSubmit = async () => {
   height: 100vh;
 
   .wrapper {
-    width: 800px;
+    width: 700px;
     background-color: #fff;
     margin: 30px auto;
-    padding: 20px;
+    padding: 40px;
     border-radius: 5px;
     box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.2);
 
     @include mobile {
       width: 90%;
       margin: 1.2rem auto;
+      padding: 1.6rem;
+    }
+
+    h3 {
+      margin-bottom: 30px;
+      color: #666;
     }
 
     .user-data,
     .user-form {
       position: relative;
-      padding-bottom: 60px;
 
       .details {
         font-size: 16x;
         color: #555;
         display: flex;
 
-        .title {
-          text-align: right;
-        }
-
         div {
-          padding: 8px;
-          width: 150px;
+          width: 200px;
           height: 40px;
         }
       }
 
       .btn-group {
-        position: absolute;
-        right: 0;
-        bottom: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+      }
+    }
+
+    .user-form {
+      .details {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 20px;
+        font-size: 14px;
+
+        div {
+          width: 100%;
+          height: 24px;
+        }
+
+        input,
+        select {
+          padding: 10px;
+          width: 100%;
+          height: 40px;
+          font-size: 14px;
+        }
       }
     }
   }

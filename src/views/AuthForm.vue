@@ -1,5 +1,5 @@
 <template>
-  <Loading v-show="isLoading" />
+  <Loading/>
   <div class="background">
     <div class="form-container">
       <form class="auth-form" @submit.prevent="handleSubmit" v-if="isLoginForm">
@@ -27,15 +27,13 @@ import { useRouter } from 'vue-router'
 import Loading from '@/components/Loading.vue'
 import { useAuthStore } from '@/stores/auth'
 import { useUserStore } from '@/stores/user'
+import { useLoadingStore } from '@/stores/loading'
 import { useApiErrorHandler } from '@/hooks/useApiErrorHandler'
 import api from '@/api/axios'
-
 
 const router = useRouter()
 const isLoginForm = ref(true)
 const isNewUser = ref(false)
-
-const isLoading = ref(false)
 
 const email = ref('')
 const password = ref('')
@@ -43,12 +41,13 @@ const confirmPassword = ref('')
 
 const auth = useAuthStore()
 const user = useUserStore()
+const loading = useLoadingStore()
 
 const handleSubmit = async () => {
   if (isLoginForm.value) {
     // login 
     try {
-      isLoading.value = true
+      loading.showLoading()
       const res = await api.post('/user/login', { email: email.value, password: password.value })
       const token = res.token
       const userId = res.userId
@@ -65,14 +64,14 @@ const handleSubmit = async () => {
         } catch (error) {
           useApiErrorHandler(error)
         } finally {
-          isLoading.value = false
+          loading.closeLoading()
         }
       }
 
     } catch (error) {
       useApiErrorHandler(error)
     } finally {
-      isLoading.value = false
+      loading.closeLoading()
     }
   } else {
     // signup
@@ -102,7 +101,8 @@ const handleSubmit = async () => {
   align-items: center;
   flex-direction: column;
   background-color: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(3px);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 
   .auth-form {
     display: flex;
@@ -111,7 +111,7 @@ const handleSubmit = async () => {
     flex-direction: column;
     background-color: #fff;
     max-width: 400px;
-    padding: 60px;
+    padding: 70px;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
 
     @include mobile {
@@ -126,7 +126,7 @@ const handleSubmit = async () => {
 
     input {
       font-size: 16px;
-      width: 280px;
+      width: 240px;
       padding: 15px 15px;
       margin-bottom: 12px;
       border: 1px solid #ddd;
@@ -134,7 +134,7 @@ const handleSubmit = async () => {
 
     button {
       font-size: 16px;
-      width: 280px;
+      width: 240px;
       padding: 15px 0;
       border: none;
       font-weight: bold;

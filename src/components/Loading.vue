@@ -1,28 +1,39 @@
 <template>
-  <div class="wrapper">
-    <div class="lds-roller">
-      <div></div>
-      <div></div>
-      <div></div>
-      <div></div>
-      <div></div>
-      <div></div>
-      <div></div>
-      <div></div>
+  <Teleport to="body">
+    <div class="mask" v-if="loading.isLoading">
+      <div class="lds-roller">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+      </div>
     </div>
-  </div>
+  </Teleport>
 </template>
 
+<script setup>
+import { useLoadingStore } from '@/stores/loading'
+const loading = useLoadingStore()
+</script>
+
 <style scoped>
-.wrapper {
+.mask {
   display: flex;
   justify-content: center;
-  align-items: center; 
+  align-items: center;
   width: 100%;
   height: 100%;
-  z-index: 999;
+  z-index: 9999;
   background-color: rgba(0, 0, 0, 0.3);
   position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 .lds-roller {

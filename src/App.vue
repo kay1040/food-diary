@@ -1,7 +1,6 @@
 <template>
   <AppHeader />
   <router-view />
-  <footer />
 </template>
 
 <script setup>

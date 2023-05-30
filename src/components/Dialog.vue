@@ -38,9 +38,12 @@
 import axios from 'axios'
 import { nanoid } from 'nanoid'
 import { reactive, ref, watchEffect } from 'vue'
+import { useLoadingStore } from '@/stores/loading'
 
 const props = defineProps(['dialog-visible', 'title', 'selected-food'])
 const emits = defineEmits(['on-close', 'on-add', 'on-edit'])
+
+const loading = useLoadingStore()
 
 const formRef = ref(null)
 
@@ -54,6 +57,7 @@ const foodData = reactive({ id: '', name: '', calories: '' })
 
 const handleSearch = async (food) => {
   try {
+    loading.showLoading()
     const api_key = import.meta.env.VITE_SOME_USDA_API_KEY
     const response = await axios.get('https://api.nal.usda.gov/fdc/v1/foods/search', {
       params: {
@@ -74,6 +78,8 @@ const handleSearch = async (food) => {
       message: error.message,
       type: 'error'
     })
+  } finally {
+    loading.closeLoading()
   }
 }
 
