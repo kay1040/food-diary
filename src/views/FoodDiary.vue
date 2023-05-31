@@ -15,7 +15,7 @@
           </el-icon>
         </div>
         <ul class="list">
-          <li v-if="getFoodsDataBySelectedDay()" v-for="food in getFoodsDataBySelectedDay()" :key="food.id">
+          <li v-if="getFoodsDataBySelectedDay" v-for="food in getFoodsDataBySelectedDay" :key="food.id">
             <span>{{ food.name }} - {{ food.calories }} kcal</span>
             <span>
               <el-icon class="icon" @click="handleShowEditDialog(food.id)">
@@ -28,7 +28,7 @@
           </li>
         </ul>
       </div>
-      <div v-if="getFoodsDataBySelectedDay()">
+      <div v-if="getFoodsDataBySelectedDay">
         <div class="calories">
           <span>Total calories</span>
           <span>{{ userFoodsData.find(item => item.date === selectedDay)?.totalCalories }} kcal</span>
@@ -43,7 +43,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import Loading from '@/components/Loading.vue'
 import Dialog from '@/components/Dialog.vue'
 import Calendar from '@/components/Calendar.vue'
@@ -63,11 +63,10 @@ const dialogVisible = reactive({ value: false })
 let dialogTitle = ref('')
 
 const currentDate = new Date()
-let year = currentDate.getFullYear()
-let month = String(currentDate.getMonth() + 1).padStart(2, '0')
-let day = String(currentDate.getDate()).padStart(2, '0')
-
-const selectedDay = ref(`${year}-${month}-${day}`)
+let year = ref(currentDate.getFullYear())
+let month = ref(String(currentDate.getMonth() + 1).padStart(2, '0'))
+let day = ref(String(currentDate.getDate()).padStart(2, '0'))
+const selectedDay = computed(() => `${year.value}-${month.value}-${day.value}`)
 
 let userFoodsData = ref([])
 
@@ -75,7 +74,7 @@ const fetchUserFoodsData = async () => {
   try {
     loading.showLoading()
     const userId = auth.userId
-    const res = await api.get(`/food/${userId}/${year}/${month}`)
+    const res = await api.get(`/food/${userId}/${year.value}/${month.value}`)
     userFoodsData.value = res.foodRecords
     userFoodsData.value.forEach(item => {
       item.date = item.date.toString().split("T")[0]
@@ -93,41 +92,42 @@ onMounted(() => {
 
 let selectedFood = reactive({})
 
-const getSelectedDay = (day) => {
-  selectedDay.value = day
-  year = selectedDay.value.split('-')[0]
-  month = selectedDay.value.split('-')[1]
-  day = selectedDay.value.split('-')[2]
-  fetchUserFoodsData()
+const getSelectedDay = (newDay) => {
+  if (newDay.split('-')[1] === month.value) {
+    day.value = newDay.split('-')[2]
+  } else {
+    month.value = newDay.split('-')[1]
+    day.value = newDay.split('-')[2]
+    fetchUserFoodsData()
+  }
 }
 
 const getSelectedMonth = (val) => {
   switch (val) {
     case 'next-month':
-      if (month === '12') {
-        month = '01'
-        year = year + 1
+      if (month.value === '12') {
+        month.value = '01'
+        year.value = year.value + 1
       } else {
-        month = (month * 1 + 1).toString().padStart(2, '0')
+        month.value = (month.value * 1 + 1).toString().padStart(2, '0')
       }
-      day = '01'
+      day.value = '01'
       break
     case 'prev-month':
       if (month === '01') {
         month = '12'
-        year = year - 1
+        year.value = year.value - 1
       } else {
-        month = (month * 1 - 1).toString().padStart(2, '0')
+        month.value = (month.value * 1 - 1).toString().padStart(2, '0')
       }
-      day = 1
+      day.value = '01'
       break
     case 'today':
-      month = String(currentDate.getMonth() + 1).padStart(2, '0')
-      year = currentDate.getFullYear()
-      day = String(currentDate.getDate()).padStart(2, '0')
+      month.value = String(currentDate.getMonth() + 1).padStart(2, '0')
+      year.value = currentDate.getFullYear()
+      day.value = String(currentDate.getDate()).padStart(2, '0')
       break
   }
-  selectedDay.value = `${year}-${month}-${day}`
   fetchUserFoodsData()
 }
 
@@ -135,9 +135,8 @@ const handleCloseDialog = () => {
   dialogVisible.value = false
 }
 
-const getFoodsDataBySelectedDay = () => {
-  return userFoodsData.value.filter(item => item.date === selectedDay.value)[0]?.foods || null
-}
+const getFoodsDataBySelectedDay = computed(() => userFoodsData.value.find(item => item.date === selectedDay.value)?.foods || null)
+
 
 const handleShowAddDialog = () => {
   dialogVisible.value = true
@@ -148,12 +147,10 @@ const handleShowAddDialog = () => {
 }
 
 const handleAddFood = async (foodData) => {
-  const date = selectedDay.value
-  const userId = auth.userId
   try {
     await api.post('/food/', {
-      userId,
-      date,
+      userId: auth.userId,
+      date: selectedDay.value,
       foods: [
         { ...foodData },
       ],
@@ -168,8 +165,7 @@ const handleAddFood = async (foodData) => {
 const handleShowEditDialog = (id) => {
   dialogVisible.value = true
   dialogTitle.value = 'EDIT FOOD'
-  const date = selectedDay.value
-  const index = userFoodsData.value.findIndex(item => item.date === date);
+  const index = userFoodsData.value.findIndex(item => item.date === selectedDay.value);
   selectedFood.id = userFoodsData.value[index].foods.find(item => item.id === id).id
   selectedFood.name = userFoodsData.value[index].foods.find(item => item.id === id).name
   selectedFood.calories = userFoodsData.value[index].foods.find(item => item.id === id).calories
@@ -177,8 +173,7 @@ const handleShowEditDialog = (id) => {
 
 const handleEditFood = async (foodData) => {
   try {
-    const date = selectedDay.value
-    const index = userFoodsData.value.findIndex(item => item.date === date)
+    const index = userFoodsData.value.findIndex(item => item.date === selectedDay.value)
     const foodIndex = userFoodsData.value[index].foods.findIndex(item => item.id === foodData.id)
     userFoodsData.value[index].foods[foodIndex] = { ...foodData }
     const recordId = userFoodsData.value[index]._id
@@ -201,8 +196,7 @@ const handleDeleteFood = async (id) => {
       showCancelButton: true,
       closeOnClickModal: false,
     })
-    const date = selectedDay.value
-    const index = userFoodsData.value.findIndex(item => item.date === date)
+    const index = userFoodsData.value.findIndex(item => item.date === selectedDay.value)
     const recordId = userFoodsData.value[index]._id
     const foods = userFoodsData.value[index].foods.filter(item => item.id !== id)
     const totalCalories = foods.reduce((sum, food) => sum + food.calories, 0)

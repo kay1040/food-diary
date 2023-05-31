@@ -2,11 +2,10 @@
   <el-dialog v-model="props.dialogVisible.value" :before-close="() => handleClose(formRef)" :width=dialogWidth
     :title="props.title">
     <span class="desc">
-      You can click
+      You can either query the calorie content of a food from USDA by clicking  
       <el-icon>
         <Search />
-      </el-icon>
-      button to look up the calorie content of a food (per 100g / kcal), or enter it manually.
+      </el-icon> button or enter it manually.
     </span>
     <el-form :model="foodData" class="form" ref="formRef">
       <el-form-item label="Food:" prop="name" :rules="[{ required: true, message: 'Name is required.' }]">
@@ -73,6 +72,10 @@ const handleSearch = async (food) => {
       throw Error(response.status)
     }
   } catch (error) {
+    if (error.message === "Cannot read properties of undefined (reading 'value')" || 
+    error.message === "Cannot read properties of undefined (reading 'foodNutrients')") {
+      error.message = 'Food data not found'
+    }
     ElMessage({
       showClose: true,
       message: error.message,
