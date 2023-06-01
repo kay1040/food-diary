@@ -3,7 +3,7 @@
 </template>
   
 <script setup>
-import { defineProps, ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 
 function useTypingEffect(text, delay) {
   const typedText = ref('')

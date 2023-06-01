@@ -26,7 +26,7 @@
 </template>
 
 <script setup>
-import { ref, defineEmits } from 'vue'
+import { ref } from 'vue'
 
 const props = defineProps(['foods-data'])
 const emits = defineEmits(['selected-day', 'selected-month'])
