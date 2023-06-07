@@ -77,7 +77,7 @@ const handleSubmit = async () => {
     // signup
     isNewUser.value = true
     try {
-      isLoading.value = true
+      loading.showLoading()
       if (password.value === confirmPassword.value) {
         await api.post('/user/signup', { email: email.value, password: password.value })
         ElMessage.success('Signup successful. Please log in again!')
@@ -88,7 +88,7 @@ const handleSubmit = async () => {
     } catch (error) {
       useApiErrorHandler(error)
     } finally {
-      isLoading.value = false
+      loading.closeLoading()
     }
   }
 }

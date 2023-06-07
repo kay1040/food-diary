@@ -1,6 +1,6 @@
 <template>
   <Loading />
-  <Dialog :dialog-visible="dialogVisible" :title="dialogTitle" :selected-food="selectedFood" @on-close="handleCloseDialog"
+  <Dialog :is-show="isShowDialog" :title="dialogTitle" :selected-food="selectedFood" @on-close="handleCloseDialog"
     @on-add="handleAddFood" @on-edit="handleEditFood" />
   <div class="food-diary">
     <div class="calender">
@@ -14,8 +14,8 @@
             <Plus />
           </el-icon>
         </div>
-        <ul class="list">
-          <li v-if="getFoodsDataBySelectedDay" v-for="food in getFoodsDataBySelectedDay" :key="food.id">
+        <ul class="list" v-if="getFoodsDataBySelectedDay">
+          <li v-for="food in getFoodsDataBySelectedDay" :key="food.id">
             <span>{{ food.name }} - {{ food.calories }} kcal</span>
             <span>
               <el-icon class="icon" @click="handleShowEditDialog(food.id)">
@@ -58,7 +58,7 @@ const auth = useAuthStore()
 
 const loading = useLoadingStore()
 
-const dialogVisible = reactive({ value: false })
+let isShowDialog = ref(false)
 
 let dialogTitle = ref('')
 
@@ -114,8 +114,8 @@ const getSelectedMonth = (val) => {
       day.value = '01'
       break
     case 'prev-month':
-      if (month === '01') {
-        month = '12'
+      if (month.value === '01') {
+        month.value = '12'
         year.value = year.value - 1
       } else {
         month.value = (month.value * 1 - 1).toString().padStart(2, '0')
@@ -132,14 +132,14 @@ const getSelectedMonth = (val) => {
 }
 
 const handleCloseDialog = () => {
-  dialogVisible.value = false
+  isShowDialog.value = false
 }
 
 const getFoodsDataBySelectedDay = computed(() => userFoodsData.value.find(item => item.date === selectedDay.value)?.foods || null)
 
 
 const handleShowAddDialog = () => {
-  dialogVisible.value = true
+  isShowDialog.value = true
   dialogTitle.value = 'ADD FOOD'
   selectedFood.id = ''
   selectedFood.name = ''
@@ -163,7 +163,7 @@ const handleAddFood = async (foodData) => {
 }
 
 const handleShowEditDialog = (id) => {
-  dialogVisible.value = true
+  isShowDialog.value = true
   dialogTitle.value = 'EDIT FOOD'
   const index = userFoodsData.value.findIndex(item => item.date === selectedDay.value);
   selectedFood.id = userFoodsData.value[index].foods.find(item => item.id === id).id

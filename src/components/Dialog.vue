@@ -1,8 +1,7 @@
 <template>
-  <el-dialog v-model="props.dialogVisible.value" :before-close="() => handleClose(formRef)" :width=dialogWidth
-    :title="props.title">
+  <el-dialog v-model="dialogVisible" :before-close="() => handleClose(formRef)" :width=dialogWidth :title="props.title">
     <span class="desc">
-      You can either query the calorie content of a food from USDA by clicking  
+      You can either query the calorie content of a food from USDA by clicking
       <el-icon>
         <Search />
       </el-icon> button or enter it manually.
@@ -36,11 +35,17 @@
 <script setup>
 import axios from 'axios'
 import { nanoid } from 'nanoid'
-import { reactive, ref, watchEffect } from 'vue'
+import { reactive, ref, watch, watchEffect } from 'vue'
 import { useLoadingStore } from '@/stores/loading'
 
-const props = defineProps(['dialog-visible', 'title', 'selected-food'])
+const props = defineProps(['is-show', 'title', 'selected-food'])
 const emits = defineEmits(['on-close', 'on-add', 'on-edit'])
+
+let dialogVisible = ref(false)
+
+watch(() => props.isShow, (newValue) => {
+  dialogVisible.value = newValue
+})
 
 const loading = useLoadingStore()
 
@@ -72,8 +77,8 @@ const handleSearch = async (food) => {
       throw Error(response.status)
     }
   } catch (error) {
-    if (error.message === "Cannot read properties of undefined (reading 'value')" || 
-    error.message === "Cannot read properties of undefined (reading 'foodNutrients')") {
+    if (error.message === "Cannot read properties of undefined (reading 'value')" ||
+      error.message === "Cannot read properties of undefined (reading 'foodNutrients')") {
       error.message = 'Food data not found'
     }
     ElMessage({
@@ -116,20 +121,21 @@ const handleCancel = (formRef) => {
   emits('on-close')
 }
 
-const handleClose = (formRef) => {
+const handleClose = async (formRef) => {
   if (!formRef) return
-  ElMessageBox.confirm('Are you sure to close this dialog?')
-    .then(() => {
-      formRef.resetFields()
-      emits('on-close')
-    })
-    .catch((error) => {
+  try {
+    await ElMessageBox.confirm('Are you sure to close this dialog?')
+    formRef.resetFields()
+    emits('on-close')
+  } catch (error) {
+    if (error !== 'cancel') {
       ElMessage({
         showClose: true,
         message: error.message,
-        type: 'error'
+        type: 'error',
       })
-    })
+    }
+  }
 }
 
 </script>

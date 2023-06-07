@@ -21,10 +21,13 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.1.0",
+    "eslint": "^8.42.0",
+    "eslint-plugin-vue": "^9.14.1",
     "sass": "^1.62.1",
     "sass-loader": "^13.2.2",
     "unplugin-auto-import": "^0.15.3",
     "unplugin-vue-components": "^0.24.1",
-    "vite": "^4.3.2"
+    "vite": "^4.3.2",
+    "vite-plugin-eslint": "^1.8.1"
   }
 }
