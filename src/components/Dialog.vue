@@ -1,7 +1,7 @@
 <template>
   <el-dialog v-model="dialogVisible" :before-close="() => handleClose(formRef)" :width=dialogWidth :title="props.title">
     <span class="desc">
-      You can either query the calorie content of a food from USDA by clicking
+      You can either query the calorie content of a food per 100g from USDA by clicking
       <el-icon>
         <Search />
       </el-icon> button or enter it manually.
