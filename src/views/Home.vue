@@ -31,7 +31,7 @@ const goToStart = () => {
 onMounted(() => {
   setTimeout(() => {
     buttonVisible.value = 'visible'
-  }, title.length * 50 + 2000);
+  }, title.length * 50 + 1200);
 
 })
 </script>
@@ -63,6 +63,7 @@ onMounted(() => {
       white-space: pre-wrap;
       color: white;
       font-size: 36px;
+      text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.2);
 
       @include mobile {
         padding: 0 1.5rem;

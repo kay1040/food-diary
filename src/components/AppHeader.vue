@@ -1,7 +1,7 @@
 <template>
   <header :style="{ backgroundColor: isShowHeaderColor ? '#697785' : '' }">
     <div class="logo">
-      <a href="/">Food Diary</a>
+      <a href="/">Healthy Journey</a>
     </div>
     <div class="user" v-if="isShowUserIcon">
       <el-icon @click.stop="isShowUserMenu = !isShowUserMenu">
@@ -64,7 +64,7 @@ header {
   .logo {
     font-weight: bold;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.2);
+    user-select: none;
 
     a {
       z-index: 9999;
