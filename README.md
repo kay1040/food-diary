@@ -42,13 +42,14 @@
 
 ### 使用者菜單
 
-資料填寫完畢會跳轉到 User Information，可以點擊右上角 user icon 跳轉頁面
+資料填寫完畢會跳轉到 User Information，可以點擊右上角 user icon 開啟使用者菜單跳轉頁面
 
 ![menu](https://github.com/kay1040/food-diary/assets/112454167/e0f60631-9637-4c1f-a9a3-b62eca43b1fc)
 
 ### 飲食紀錄
 
 計算一天所攝取的總熱量，再用TDEE扣除總熱量得到剩餘熱量
+
 <img src="https://github.com/kay1040/food-diary/assets/112454167/3fd1054b-d32d-4805-a4b3-26461246e8de" width="952" alt="newProducts">
 
 新增食物
