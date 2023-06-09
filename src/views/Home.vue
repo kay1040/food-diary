@@ -14,7 +14,7 @@ import { onMounted, ref } from 'vue'
 import router from '@/router'
 import { useAuthStore } from '@/stores/auth'
 
-const title = "Healthy eating is a jouney, not a destination.\nLet's enjoy the ride!"
+const title = "Healthy eating is a journey, not a destination.\nLet's enjoy the ride!"
 let buttonVisible = ref('hidden')
 
 
