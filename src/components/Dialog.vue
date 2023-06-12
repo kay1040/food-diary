@@ -95,8 +95,9 @@ watchEffect(() => {
   Object.assign(foodData, props.selectedFood)
 })
 
-const handleSubmit = (formRef, foodData) => {
-  formRef.validate(async (valid) => {
+const handleSubmit = async (formRef, foodData) => {
+  if (!formRef) return
+  await formRef.validate((valid) => {
     if (valid) {
       if (props.title === 'ADD FOOD') {
         foodData.id = nanoid()
@@ -117,6 +118,7 @@ const handleSubmit = (formRef, foodData) => {
 }
 
 const handleCancel = (formRef) => {
+  if (!formRef) return
   formRef.resetFields()
   emits('on-close')
 }

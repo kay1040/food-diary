@@ -3,44 +3,52 @@
     <Transition name="fade-slide-down-up" appear>
       <div v-show="isShowNextStep" class="start">
         <div class="img" :style="{ backgroundImage: steps[current].backgroundImage }"></div>
-        <form class="form" :style="{ backgroundColor: steps[current].backgroundColor }">
+        <el-form :model="formData" class="form" ref="formRef" :rules="rules"
+          :style="{ backgroundColor: steps[current].backgroundColor }">
           <div>
             <div class="question">{{ steps[current].question }}</div>
             <div class="answer">
-              <el-select v-model="steps[current].answer" v-if="current === 0" placeholder="Select" size="large">
-                <el-option label="Male" value="male" />
-                <el-option label="Female" value="female" />
-              </el-select>
-              <el-input v-model.number="steps[current].answer" v-else-if="current === 1" size="large"
-                placeholder="Please Input" />
-              <el-input v-model.number="steps[current].answer" v-else-if="current === 2" size="large"
-                placeholder="Please Input">
-                <template #append>cm</template>
-              </el-input>
-              <el-input v-model.number="steps[current].answer" v-else-if="current === 3" size="large"
-                placeholder="Please Input">
-                <template #append>kg</template>
-              </el-input>
-              <el-select v-model="steps[current].answer" v-else-if="current === 4" placeholder="Select" size="large">
-                <el-option label="Sedentary: office work, no exercise habits" value="sedentary" />
-                <el-option label="Lightly: exercise 1-2 days/week" value="lightly" />
-                <el-option label="Moderately: exercise 3-5 days/week" value="moderately" />
-                <el-option label="Heavy: exercise 6-7 days/week" value="heavy" />
-                <el-option label="Extremely: athlete level, exercise 2 times a day" value="extremely" />
-              </el-select>
+              <el-form-item prop="gender">
+                <el-select v-model="formData.gender" v-if="current === 0" placeholder="Select" size="large">
+                  <el-option label="Male" value="male" />
+                  <el-option label="Female" value="female" />
+                </el-select>
+              </el-form-item>
+              <el-form-item prop="age">
+                <el-input v-model.number="formData.age" v-if="current === 1" size="large" placeholder="Please Input" />
+              </el-form-item>
+              <el-form-item prop="height">
+                <el-input v-model.number="formData.height" v-if="current === 2" size="large" placeholder="Please Input">
+                  <template #append>cm</template>
+                </el-input>
+              </el-form-item>
+              <el-form-item prop="weight">
+                <el-input v-model.number="formData.weight" v-if="current === 3" size="large" placeholder="Please Input">
+                  <template #append>kg</template>
+                </el-input>
+              </el-form-item>
+              <el-form-item prop="activityLevel">
+                <el-select v-model="formData.activityLevel" v-if="current === 4" placeholder="Select" size="large">
+                  <el-option label="Sedentary: office work, no exercise habits" value="sedentary" />
+                  <el-option label="Lightly: exercise 1-2 days/week" value="lightly" />
+                  <el-option label="Moderately: exercise 3-5 days/week" value="moderately" />
+                  <el-option label="Heavy: exercise 6-7 days/week" value="heavy" />
+                  <el-option label="Extremely: athlete level, exercise 2 times a day" value="extremely" />
+                </el-select>
+              </el-form-item>
               <button v-show="isShowPrevBtn" class="prev btn" @click.prevent="handlePrevStep">
                 <el-icon>
                   <Back />
                 </el-icon>
               </button>
-              <button class="next btn" @click.prevent="handleNextStep">
+              <button class="next btn" @click.prevent="handleNextStep(formRef)">
                 <el-icon>
                   <Right />
                 </el-icon>
               </button>
             </div>
           </div>
-        </form>
+        </el-form>
       </div>
     </Transition>
   </div>
@@ -65,35 +73,66 @@ let current = ref(0)
 const steps = reactive([
   {
     question: 'What is your gender?',
-    answer: '',
     backgroundImage: 'url("/images/start-bg1.jpg")',
     backgroundColor: '#0a1e25',
+    prop: 'gender'
   },
   {
     question: 'What is your age?',
-    answer: '',
     backgroundImage: 'url("/images/start-bg2.jpg")',
     backgroundColor: '#281b08',
+    prop: 'age'
   },
   {
     question: 'What is your height?',
-    answer: '',
     backgroundImage: 'url("/images/start-bg3.jpg")',
-    backgroundColor: '#444c41'
+    backgroundColor: '#444c41',
+    prop: 'height'
   },
   {
     question: 'What is your weight?',
-    answer: '',
     backgroundImage: 'url("/images/start-bg4.jpg")',
-    backgroundColor: '#12161a'
+    backgroundColor: '#12161a',
+    prop: 'weight'
   },
   {
     question: 'What is your activity level?',
-    answer: '',
     backgroundImage: 'url("/images/start-bg5.jpg")',
-    backgroundColor: '#111e0d'
+    backgroundColor: '#111e0d',
+    prop: 'activityLevel'
   },
 ])
+
+const formRef = ref(null)
+
+const formData = reactive({
+  gender: '',
+  age: '',
+  height: '',
+  weight: '',
+  activityLevel: '',
+})
+
+const rules = reactive({
+  gender: [
+    { required: true, message: 'Please select gender' },
+  ],
+  age: [
+    { required: true, message: 'Please input age'},
+    { type: 'number', message: 'Age must be a number'}
+  ],
+  height: [
+    { required: true, message: 'Please input height'},
+    { type: 'number', message: 'Height must be a number'}
+  ],
+  weight: [
+    { required: true, message: 'Please input weight'},
+    { type: 'number', message: 'Weight must be a number'}
+  ],
+  activityLevel: [
+    { required: true, message: 'Please select activity level'},
+  ],
+})
 
 const handlePrevStep = () => {
   if (current.value > 0) {
@@ -105,26 +144,34 @@ const handlePrevStep = () => {
   }
 }
 
-const handleNextStep = async () => {
+const handleNextStep = async (formRef) => {
   if (current.value < steps.length - 1) {
-    isShowNextStep.value = false
-    setTimeout(() => {
-      current.value = current.value + 1
-      isShowNextStep.value = true
-    }, 200)
+    await formRef.validateField(steps[current.value].prop, (valid) => {
+      if (valid) {
+        isShowNextStep.value = false
+        setTimeout(() => {
+          current.value = current.value + 1
+          isShowNextStep.value = true
+        }, 200)
+      } else {
+        return
+      }
+    })
   } else {
-    try {
-      const userId = auth.userId
-      user.userInfo.gender = steps[0].answer
-      user.userInfo.age = steps[1].answer
-      user.userInfo.height = steps[2].answer
-      user.userInfo.weight = steps[3].answer
-      user.userInfo.activityLevel = steps[4].answer
-      await api.post('/user', { userId, ...user.userInfo })
-      router.push({ name: 'userInfo' })
-    } catch (error) {
-      useApiErrorHandler(error)
-    }
+    await formRef.validateField('activityLevel', async (valid) => {
+      if (valid) {
+        try {
+          const userId = auth.userId
+          user.updateUserInfo(formData)
+          await api.post('/user', { userId, ...user.userInfo })
+          router.push({ name: 'userInfo' })
+        } catch (error) {
+          useApiErrorHandler(error)
+        }
+      } else {
+        return
+      }
+    })
   }
 }
 
