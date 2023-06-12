@@ -52,14 +52,17 @@
         <div class="details">
           <div>Age</div>
           <input name="age" id="age" type="text" v-model.number="formData.age">
+          <div class="error" v-if="errorMessages.age">{{ errorMessages.age }}</div>
         </div>
         <div class="details">
           <div>Height</div>
           <input name="height" id="height" type="text" v-model.number="formData.height">
+          <div class="error" v-if="errorMessages.height">{{ errorMessages.height }}</div>
         </div>
         <div class="details">
           <div>Weight</div>
           <input name="weight" id="weight" type="text" v-model.number="formData.weight">
+          <div class="error" v-if="errorMessages.weight">{{ errorMessages.weight }}</div>
         </div>
         <div class="details">
           <div>Activity Level</div>
@@ -82,7 +85,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import Loading from '@/components/Loading.vue'
 import { useUserStore } from '@/stores/user'
 import { useAuthStore } from '@/stores/auth'
@@ -98,6 +101,13 @@ const userId = auth.userId
 const loading = useLoadingStore()
 let userData = ref({})
 let formData = ref({})
+
+const errorMessages = reactive({
+  age: '',
+  height: '',
+  weight: '',
+})
+
 
 const fetchUserData = async () => {
   try {
@@ -121,18 +131,55 @@ const isEdit = ref(false)
 
 const handleSubmit = async () => {
   try {
-    if (userData.value.userInfo) {
-      await api.put(`/user/${userId}`, { ...formData.value })
-    } else {
-      await api.post('/user', { userId, ...formData.value })
+    Object.keys(errorMessages).forEach((key) => {
+      errorMessages[key] = ''
+    })
+
+    let isValid = true
+
+    const agePattern = /^\d+$/
+    if (!formData.value.age) {
+      errorMessages.age = 'Please input age'
+      isValid = false
+    } else if (!agePattern.test(formData.value.age)) {
+      errorMessages.age = 'Age must be a number'
+      isValid = false
     }
-    user.updateUserInfo(formData.value)
-    fetchUserData()
-    isEdit.value = false
+
+    const heightPattern = /^\d+$/
+    if (!formData.value.height) {
+      errorMessages.height = 'Please input height'
+      isValid = false
+    } else if (!heightPattern.test(formData.value.height)) {
+      errorMessages.height = 'Height must be a number'
+      isValid = false
+    }
+
+    const weightPattern = /^\d+$/
+    if (!formData.value.weight) {
+      errorMessages.weight = 'Please input weight'
+      isValid = false
+    } else if (!weightPattern.test(formData.value.weight)) {
+      errorMessages.weight = 'Weight must be a number'
+      isValid = false
+    }
+
+    if (isValid) {
+      if (userData.value.userInfo) {
+        await api.put(`/user/${userId}`, { ...formData.value })
+      } else {
+        await api.post('/user', { userId, ...formData.value })
+      }
+
+      user.updateUserInfo(formData.value)
+      fetchUserData()
+      isEdit.value = false
+    }
   } catch (error) {
     useApiErrorHandler(error)
   }
 }
+
 
 </script>
 
@@ -169,6 +216,13 @@ const handleSubmit = async () => {
         font-size: 16x;
         color: #555;
         display: flex;
+
+        .error {
+          color: red;
+          font-size: 12px;
+          margin-top: 5px;
+          margin-left: 5px;
+        }
 
         div {
           width: 200px;
